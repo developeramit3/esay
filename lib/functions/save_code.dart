@@ -21,3 +21,13 @@ addCode(
   );
   SharedPreferenceHelper().setCodesPrefs(code);
 }
+
+
+adCode(
+    BuildContext context, String endDateTime) {
+  CodeModel codeModel = CodeModel(
+    endDateTime: endDateTime,
+  );
+  list.items.clear();
+  list.items.add(codeModel);
+}

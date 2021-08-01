@@ -7,7 +7,7 @@ import 'package:esay/ui/offers/offer_details_screen.dart';
 import 'package:esay/ui/sharing/sharing_screen.dart';
 import 'package:esay/ui/store/login_store_screen.dart';
 import 'package:flutter/material.dart';
-
+import 'my_app.dart';
 class Routes {
   Routes._();
   static const String homeScreen = '/homeScreen';
@@ -19,6 +19,7 @@ class Routes {
   static const String loginStoreScreen = '/loginStoreScreen';
   static const String offerDetailsScreen = '/offerDetailsScreen';
   static const String sharingScreen = '/sharingScreen';
+  static const String mainScreen = '/mainScreen';
 
   static final routes = <String, WidgetBuilder>{
     homeScreen: (BuildContext context) => HomeScreen(),
@@ -30,5 +31,6 @@ class Routes {
     loginStoreScreen: (BuildContext context) => LoginStoreScreen(),
     offerDetailsScreen: (BuildContext context) => OfferDetailsScreen(),
     sharingScreen: (BuildContext context) => SharingScreen(),
+    mainScreen :(BuildContext context)=> MyApp(),
   };
 }

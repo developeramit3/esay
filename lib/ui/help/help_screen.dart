@@ -1,8 +1,9 @@
 import 'dart:io';
-
+import 'package:esay/widgetEdit/terms_of_use/terms_of_use.dart';
 import 'package:device_info/device_info.dart';
 import 'package:esay/functions/url_launcher.dart';
 import 'package:esay/providers/bottom_animation_provider.dart';
+import 'package:esay/widgetEdit/accont_acsept.dart';
 import 'package:esay/widgets/get_deviceId.dart';
 import 'package:esay/widgets/navbar.dart';
 import 'package:flutter/material.dart';
@@ -136,6 +137,7 @@ class _HelpScreenState extends State<HelpScreen> {
                     ),
                   ],
                 ),
+
                 SizedBox(
                   height: 150,
                 ),
@@ -167,6 +169,31 @@ class _HelpScreenState extends State<HelpScreen> {
                   height: 10,
                 ),
               ]),
+              SizedBox(height: 10,),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  InkWell(
+                   onTap: (){
+                     Navigator.push(context,MaterialPageRoute(builder: (context)=>PrivacyPolicy(text: 'سياسة الخصوصية و شروط الاستخدام',)));
+                   },
+                    child: Text("سياسة الخصوصية و ",style: TextStyle(
+                      color: HexColor("#49494a"),
+                      decoration: TextDecoration.underline,
+                    ),),
+                  ),
+                  InkWell(
+                    onTap: (){
+                      Navigator.push(context,MaterialPageRoute(builder: (context)=>TermsOfUse()));
+                    },
+                    child: Text(" شروط الاستخدام",style: TextStyle(
+                      color: HexColor("#49494a"),
+                      decoration: TextDecoration.underline,
+                    ),),
+                  )
+                ],
+              ),
             ],
           ),
         ),

@@ -91,8 +91,8 @@ class _SMSScreenState extends State<SMSScreen> {
                 Container(
                   color: Colors.white,
                   margin: const EdgeInsets.only(
-                      top: 15, bottom: 15, left: 80, right: 80),
-                  padding: const EdgeInsets.all(20.0),
+                      top: 15, bottom: 0, left: 80, right: 80),
+                  padding: const EdgeInsets.only(left: 20, right: 20, top: 20 , bottom: 10),
                   child: Directionality(
                       textDirection: TextDirection.ltr,
                       child: TextFormField(
@@ -117,12 +117,30 @@ class _SMSScreenState extends State<SMSScreen> {
                               ),
                               filled: true,
                               hintStyle: TextStyle(
-                                  color: Colors.grey[800], letterSpacing: 0.5),
+                                  color: Colors.black, letterSpacing: 0.5),
                               hintText: AppLocalizations.of(context)
                                   .translate('enterSMS'),
                               fillColor: Colors.white70))),
                 ),
-                SizedBox(height: 30),
+                InkWell(
+                  onTap: () async {
+                    final authProvider =
+                    Provider.of<AuthProvider>(context, listen: false);
+                    Future.delayed(Duration(seconds: 1), () async {
+                      await authProvider.registerWithPhoneNumber(
+                          context, widget.userModel, widget.typeAuth);
+                    });
+                  },
+                  child: Text(
+                    AppLocalizations.of(context).translate('returnNumber'),
+                    style: TextStyle(
+                        fontSize: 16,
+                        decoration: TextDecoration.underline,
+                        color: HexColor('#49494a'),
+                        fontWeight: FontWeight.bold),
+                  ),
+                ),
+                SizedBox(height: 40),
                 FlatButton(
                     height: 50,
                     minWidth: 300,
@@ -152,24 +170,7 @@ class _SMSScreenState extends State<SMSScreen> {
                             );
                     })),
                 SizedBox(height: 20),
-                InkWell(
-                  onTap: () async {
-                    final authProvider =
-                        Provider.of<AuthProvider>(context, listen: false);
-                    Future.delayed(Duration(seconds: 1), () async {
-                      await authProvider.registerWithPhoneNumber(
-                          context, widget.userModel, widget.typeAuth);
-                    });
-                  },
-                  child: Text(
-                    AppLocalizations.of(context).translate('returnNumber'),
-                    style: TextStyle(
-                        fontSize: 16,
-                        decoration: TextDecoration.underline,
-                        color: HexColor('#49494a'),
-                        fontWeight: FontWeight.bold),
-                  ),
-                ),
+
               ],
             ),
           ),

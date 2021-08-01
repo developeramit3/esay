@@ -65,8 +65,14 @@ dependencies:
   cached_network_image:
   responsive_framework:
   qr_flutter: ^3.2.0
+  confetti: ^0.5.5
+  flutter_restart: ^0.0.3
+  flutter_launcher_icons:
 
-
+flutter_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/images/easy.png"
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -87,6 +93,8 @@ flutter:
     - lang/
     - assets/images/
     - assets/animations/
+    - assets/animations/glassess duck.gif
+    - assets/images/QR scan.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

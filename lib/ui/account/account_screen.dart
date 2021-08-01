@@ -17,7 +17,7 @@ import '../../app_localizations.dart';
 import '../../widgets/appbar.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:esay/widgetEdit/dielog_qr.dart';
-
+import 'package:esay/widgetEdit/accont_fy.dart';
 class AccountScreen extends StatefulWidget {
   @override
   _AccountScreenState createState() => _AccountScreenState();
@@ -26,9 +26,11 @@ class AccountScreen extends StatefulWidget {
 class _AccountScreenState extends State<AccountScreen> {
   final LocalStorage storageCodes = LocalStorage('codes');
   StreamController listCodes = StreamController<List<CodeModel>>();
+  final _firebase = FirebaseFirestore.instance.collection('tools');
   List<CodeModel> dataList = List();
   @override
   void initState() {
+    _firebase.doc('PY08D3M4IAt4ipdiOE51').get();
     super.initState();
     try {
       Future.delayed(Duration(seconds: 0), () {
@@ -85,660 +87,555 @@ class _AccountScreenState extends State<AccountScreen> {
         appBar: appBar(context, "account", showBack: false),
         bottomNavigationBar: bottomAnimation(context),
         body: SingleChildScrollView(
-                child: Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      SizedBox(height: 20),
-                      if (authProvider.userModel.phoneNumber.isEmpty)
-                        Image.asset(
-                          'assets/images/acount.png',
-                          height: 180,
-                          width: 180,
-                        ),
-                      if (authProvider.userModel.phoneNumber.isNotEmpty)
-                        accountProvider.getShowShare
-                            ? InkWell(
-                                onTap: () {
-                                  final newRouteName = "/sharingScreen";
-                                  bool isNewRouteSameAsCurrent = false;
-                                  Navigator.popUntil(context, (route) {
-                                    if (route.settings.name == newRouteName) {
-                                      isNewRouteSameAsCurrent = true;
-                                    }
-                                    return true;
-                                  });
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                SizedBox(height: 20),
+                if (authProvider.userModel.phoneNumber.isEmpty)
+                  Image.asset(
+                    'assets/images/acount.png',
+                    height: 180,
+                    width: 180,
+                  ),
+                if (authProvider.userModel.phoneNumber.isNotEmpty)
+                  accountProvider.getShowShare
+                      ? InkWell(
 
-                                  if (!isNewRouteSameAsCurrent) {
-                                    Navigator.pushNamed(context, newRouteName);
-                                  }
-                                },
-                                child: Image.asset(
-                                  'assets/images/subs details.png',
-                                  height: 200,
-                                  width: MediaQuery.of(context).size.width,
-                                ),
-                              )
-                            : Container(),
-                      SizedBox(
-                        height: 30,
-                      ),
-                      if (authProvider.userModel.phoneNumber.isNotEmpty)
-                        StreamBuilder<List<CodeModel>>(
-                            stream: listCodes.stream,
-                            builder: (context, snapshot) {
-                              if (snapshot.data == null) {
-                                return Container();
-                              } else {
-                                if (snapshot.data.length == 0) {
-                                  return Container();
-                                }
-                                List<CodeModel> data = snapshot.data;
-                                return Container(
-                                  child: DataTable(
-                                      columns: <DataColumn>[
-                                        DataColumn(
-                                          label: Center(
-                                            child: Text(
-                                              AppLocalizations.of(context)
-                                                  .translate('code'),
-                                              style: TextStyle(
-                                                  fontWeight: FontWeight.bold,
-                                                  fontSize: 16),
-                                            ),
-                                          ),
-                                        ),
-                                        DataColumn(
-                                          label: Center(
-                                            child: Text(
-                                              AppLocalizations.of(context)
-                                                  .translate('storeNa2me'),
-                                              style: TextStyle(
-                                                  fontWeight: FontWeight.bold,
-                                                  fontSize: 16),
-                                            ),
-                                          ),
-                                        ),
-                                        DataColumn(
-                                          label: Center(
-                                            child: Text(
-                                              AppLocalizations.of(context)
-                                                  .translate('timeAccount'),
-                                              style: TextStyle(
-                                                  fontWeight: FontWeight.bold,
-                                                  fontSize: 16),
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                      rows: data.map((e) {
-                                        int endTime =
-                                            DateTime.parse(e.endDateTime)
-                                                    .millisecondsSinceEpoch +
-                                                1000 * 30;
-                                        return DataRow(
-                                          cells: [
-                                            DataCell(
-                                              InkWell(
-                                                onTap: () {
-                                                  showDialog(
-                                                      context: context,
-                                                      builder: (BuildContext
-                                                          context) {
-                                                        return CustomDialogQr(
-                                                          title:
-                                                              "رمز أيزي الخاص بك لهذا العرض هو",
-                                                          text: "شكرا !",
-                                                          code: e.code,
-                                                        );
-                                                      });
-                                                },
-                                                child: Container(
-                                                  height: 50,
-                                                  width: 50,
-                                                  child: QrImage(
-                                                    data: e.code,
-                                                    version: QrVersions.auto,
-                                                    size: 50.0,
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                            DataCell(
-                                              Center(child: Text(e.storeName)),
-                                            ),
-                                            DataCell(
-                                              Center(
-                                                child: Directionality(
-                                                    textDirection:
-                                                        TextDirection.ltr,
-                                                    child: CountdownTimer(
-                                                      endTime: endTime,
-                                                      widgetBuilder: (_,
-                                                          CurrentRemainingTime
-                                                              time) {
-                                                        int hours;
-                                                        if (time.days != null) {
-                                                          hours =
-                                                              (time.days * 24) +
-                                                                  time.hours;
-                                                        }
-                                                        return time.days == null
-                                                            ? Text(
-                                                                time.hours ==
-                                                                        null
-                                                                    ? '0  :  ${time.min}  :  ${time.sec}'
-                                                                    : time.min ==
-                                                                            null
-                                                                        ? '0  :  0  :  ${time.sec}'
-                                                                        : '${time.hours}  :  ${time.min}  :  ${time.sec}',
-                                                                style: TextStyle(
-                                                                    fontSize:
-                                                                        13,
-                                                                    letterSpacing:
-                                                                        0.5,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .bold),
-                                                              )
-                                                            : Text(
-                                                                time.days ==
-                                                                        null
-                                                                    ? '0  : 0 : ${time.min}  :  ${time.sec}'
-                                                                    : time.hours ==
-                                                                            null
-                                                                        ? '0  :  ${time.min}  :  ${time.sec}'
-                                                                        : time.min ==
-                                                                                null
-                                                                            ? '0  :  0  :  ${time.sec}'
-                                                                            : ' $hours  :  ${time.min}  :  ${time.sec}',
-                                                                style: TextStyle(
-                                                                    fontSize:
-                                                                        13,
-                                                                    letterSpacing:
-                                                                        0.5,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .bold),
-                                                              );
-                                                      },
-                                                    )),
-                                              ),
-                                            ),
-                                          ],
-                                        );
-                                      }).toList()),
-                                );
-                              }
-                            }),
-                      SizedBox(
-                        height: 30,
-                      ),
-                      if (authProvider.userModel.phoneNumber.isNotEmpty)
-                        StreamBuilder<QuerySnapshot>(
-                          stream: FirebaseFirestore.instance
-                              .collection('sharing_users')
-                              .snapshots(),
-                          builder: (BuildContext context,
-                              AsyncSnapshot<QuerySnapshot> snapshot) {
-                            if (snapshot.hasError) return Container();
-                            if (!snapshot.hasData) return Container();
-                            switch (snapshot.connectionState) {
-                              case ConnectionState.waiting:
-                                return Container();
-                              default:
-                                return snapshot.data.size != 0
-                                    ? Container(
-                                        child: Column(children: [
-                                        Text(
-                                          AppLocalizations.of(context)
-                                              .translate('sharing'),
-                                          style: TextStyle(
-                                              fontSize: 18,
-                                              fontWeight: FontWeight.bold),
-                                        ),
-                                        SizedBox(
-                                          height: 10,
-                                        ),
-                                        DataTable(
-                                            columns: <DataColumn>[
-                                              DataColumn(
-                                                label: Center(
-                                                  child: Text(
-                                                    AppLocalizations.of(context)
-                                                        .translate('storeName'),
-                                                    style: TextStyle(
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        fontSize: 16),
-                                                  ),
-                                                ),
-                                              ),
-                                              DataColumn(
-                                                label: Center(
-                                                  child: Text(
-                                                    AppLocalizations.of(context)
-                                                        .translate(
-                                                            'timeAccount'),
-                                                    style: TextStyle(
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        fontSize: 16),
-                                                  ),
-                                                ),
-                                              ),
-                                            ],
-                                            rows: snapshot.data.docs.map((e) {
-                                              int endTime = e
-                                                      .data()["endDateTime"]
-                                                      .millisecondsSinceEpoch +
-                                                  1000 * 30;
-
-                                              return DataRow(
-                                                cells: [
-                                                  DataCell(
-                                                    Center(
-                                                        child: Text(e.data()[
-                                                            "storeName"])),
-                                                  ),
-                                                  DataCell(
-                                                    Center(
-                                                      child: Directionality(
-                                                          textDirection:
-                                                              TextDirection.ltr,
-                                                          child: CountdownTimer(
-                                                            endTime: endTime,
-                                                            widgetBuilder: (_,
-                                                                CurrentRemainingTime
-                                                                    time) {
-                                                              return Directionality(
-                                                                  textDirection:
-                                                                      TextDirection
-                                                                          .rtl,
-                                                                  child: Text(
-                                                                    time.days
-                                                                            .toString() +
-                                                                        " " +
-                                                                        "يوم",
-                                                                    style: TextStyle(
-                                                                        fontSize:
-                                                                            13,
-                                                                        letterSpacing:
-                                                                            0.5,
-                                                                        fontWeight:
-                                                                            FontWeight.bold),
-                                                                  ));
-                                                            },
-                                                          )),
-                                                    ),
-                                                  ),
-                                                ],
-                                              );
-                                            }).toList()),
-                                      ]))
-                                    : Container();
-                            }
-                          },
-                        ),
-                      authProvider.userModel.phoneNumber.isNotEmpty
-                          ? Container()
-                          : Container(
-                              child: Column(children: [
-                                Padding(
-                                  padding: const EdgeInsets.only(
-                                      right: 25, left: 25, top: 25),
-                                  child: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.start,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          AppLocalizations.of(context)
-                                              .translate('accountNote'),
-                                          style: TextStyle(
-                                              fontSize: 17,
-                                              color: HexColor("#49494a"),
-                                              fontWeight: FontWeight.bold),
-                                        ),
-                                      ]),
+                          child: imageSubs(
+                              phone: authProvider.userModel.phoneNumber),
+                        )
+                      : imageSubs(phone: authProvider.userModel.phoneNumber),
+                SizedBox(
+                  height: 30,
+                ),
+                if (authProvider.userModel.phoneNumber.isNotEmpty)
+                  StreamBuilder<List<CodeModel>>(
+                      stream: listCodes.stream,
+                      builder: (context, snapshot) {
+                        if (snapshot.data == null) {
+                          return Container(
+                            height: 300,
+                            child: Column(
+                              children: [
+                                Image.asset(
+                                  'assets/animations/glassess duck.gif',
+                                  height: 180,
+                                  width: 180,
                                 ),
                                 SizedBox(
-                                  height: 50,
+                                  height: 10,
                                 ),
-                                FlatButton(
-                                    height: 50,
-                                    minWidth: 200,
-                                    color: HexColor('#2c6bec'),
-                                    onPressed: () async {
-                                      final newRouteName =
-                                          "/registerUserScreen";
-                                      bool isNewRouteSameAsCurrent = false;
-                                      Navigator.popUntil(context, (route) {
-                                        if (route.settings.name ==
-                                            newRouteName) {
-                                          isNewRouteSameAsCurrent = true;
-                                        }
-                                        return true;
-                                      });
-
-                                      if (!isNewRouteSameAsCurrent) {
-                                        Navigator.pushNamed(
-                                            context, newRouteName);
-                                      }
-                                    },
-                                    child: Text(
-                                      AppLocalizations.of(context)
-                                          .translate('addNewAccount'),
-                                      style: TextStyle(
-                                          fontSize: 20,
-                                          color: Colors.white,
-                                          fontWeight: FontWeight.bold),
-                                    )),
-                                SizedBox(height: 10),
-                                InkWell(
-                                  onTap: () {
-                                    final newRouteName = "/loginUserScreen";
-                                    bool isNewRouteSameAsCurrent = false;
-                                    Navigator.popUntil(context, (route) {
-                                      if (route.settings.name == newRouteName) {
-                                        isNewRouteSameAsCurrent = true;
-                                      }
-                                      return true;
-                                    });
-
-                                    if (!isNewRouteSameAsCurrent) {
-                                      Navigator.pushNamed(
-                                          context, newRouteName);
-                                    }
-                                  },
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    children: [
-                                      Text(
+                                Text(
+                                  "احصل على أحد رموز أيزي لتظهر هون",
+                                  style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w700),
+                                ),
+                                Text(
+                                  "وتقدر توصل للرمز بدون أنترنت",
+                                  style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w700),
+                                ),
+                              ],
+                            ),
+                          );
+                        } else {
+                          if (snapshot.data.length == 0) {
+                            return Container(
+                              alignment: Alignment.center,
+                              height: 300,
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Image.asset(
+                                    'assets/animations/glassess duck.gif',
+                                    height: 180,
+                                    width: 180,
+                                  ),
+                                  SizedBox(
+                                    height: 10,
+                                  ),
+                                  Text(
+                                    "احصل على أحد رموز أيزي لتظهر هون",
+                                    style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.w700),
+                                  ),
+                                  Text(
+                                    "وتقدر توصل للرمز بدون أنترنت",
+                                    style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.w700),
+                                  ),
+                                ],
+                              ),
+                            );
+                          }
+                          List<CodeModel> data = snapshot.data;
+                          return Container(
+                            child: DataTable(
+                                columns: <DataColumn>[
+                                  DataColumn(
+                                    label: Center(
+                                      child: Text(
                                         AppLocalizations.of(context)
-                                            .translate('haveAccount'),
+                                            .translate('code'),
                                         style: TextStyle(
-                                            fontSize: 18,
-                                            color: HexColor('#49494a'),
-                                            fontWeight: FontWeight.bold),
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 16),
                                       ),
-                                      SizedBox(width: 10),
-                                      Text(
+                                    ),
+                                  ),
+                                  DataColumn(
+                                    label: Center(
+                                      child: Text(
                                         AppLocalizations.of(context)
-                                            .translate('login'),
+                                            .translate('storeName'),
                                         style: TextStyle(
-                                            fontSize: 18,
-                                            color: HexColor('#ff5757'),
-                                            fontWeight: FontWeight.w900),
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 16),
+                                      ),
+                                    ),
+                                  ),
+                                  DataColumn(
+                                    label: Center(
+                                      child: Text(
+                                        AppLocalizations.of(context)
+                                            .translate('timeAccount'),
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 16),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                                rows: data.map((e) {
+                                  int endTime = DateTime.parse(e.endDateTime)
+                                          .millisecondsSinceEpoch +
+                                      1000 * 30;
+                                  return DataRow(
+                                    cells: [
+                                      DataCell(
+                                        InkWell(
+                                          onTap: () {
+                                            showDialog(
+                                                context: context,
+                                                builder:
+                                                    (BuildContext context) {
+                                                  return CustomDialogQr(
+                                                    title:
+                                                        "رمز أيزي الخاص بك لهذا العرض هو",
+                                                    text: "شكرا !",
+                                                    code: e.code,
+                                                  );
+                                                });
+                                          },
+                                          child: Container(
+                                            height: 50,
+                                            width: 50,
+                                            child: QrImage(
+                                              data: e.code,
+                                              version: QrVersions.auto,
+                                              size: 50.0,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      DataCell(
+                                        Center(child: Text(e.storeName)),
+                                      ),
+                                      DataCell(
+                                        Center(
+                                          child: Directionality(
+                                              textDirection: TextDirection.ltr,
+                                              child: CountdownTimer(
+                                                endTime: endTime,
+                                                widgetBuilder: (_,
+                                                    CurrentRemainingTime time) {
+                                                  int hours;
+                                                  if (time.days != null) {
+                                                    hours = (time.days * 24) +
+                                                        time.hours;
+                                                  }
+                                                  return time.days == null
+                                                      ? Text(
+                                                          time.hours == null
+                                                              ? '0  :  ${time.min}  :  ${time.sec}'
+                                                              : time.min == null
+                                                                  ? '0  :  0  :  ${time.sec}'
+                                                                  : '${time.hours}  :  ${time.min}  :  ${time.sec}',
+                                                          style: TextStyle(
+                                                              fontSize: 13,
+                                                              letterSpacing:
+                                                                  0.5,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold),
+                                                        )
+                                                      : Text(
+                                                          time.days == null
+                                                              ? '0  : 0 : ${time.min}  :  ${time.sec}'
+                                                              : time.hours ==
+                                                                      null
+                                                                  ? '0  :  ${time.min}  :  ${time.sec}'
+                                                                  : time.min ==
+                                                                          null
+                                                                      ? '0  :  0  :  ${time.sec}'
+                                                                      : ' $hours  :  ${time.min}  :  ${time.sec}',
+                                                          style: TextStyle(
+                                                              fontSize: 13,
+                                                              letterSpacing:
+                                                                  0.5,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold),
+                                                        );
+                                                },
+                                              )),
+                                        ),
                                       ),
                                     ],
-                                  ),
-                                ),
-                              ]),
-                            ),
-                    ],
-                  ),
+                                  );
+                                }).toList()),
+                          );
+                        }
+                      }),
+                SizedBox(
+                  height: 30,
                 ),
-              ),
+                // if (authProvider.userModel.phoneNumber.isNotEmpty)
 
+                authProvider.userModel.phoneNumber.isNotEmpty
+                    ? Container()
+                    : Container(
+                        child: Column(children: [
+                          Padding(
+                            padding: const EdgeInsets.only(
+                                right: 25, left: 25, top: 25),
+                            child: Column(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    AppLocalizations.of(context)
+                                        .translate('accountNote'),
+                                    style: TextStyle(
+                                        fontSize: 17,
+                                        color: HexColor("#49494a"),
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                ]),
+                          ),
+                          SizedBox(
+                            height: 50,
+                          ),
+                          FlatButton(
+                              height: 50,
+                              minWidth: 200,
+                              color: HexColor('#2c6bec'),
+                              onPressed: () async {
+                                final newRouteName = "/registerUserScreen";
+                                bool isNewRouteSameAsCurrent = false;
+                                Navigator.popUntil(context, (route) {
+                                  if (route.settings.name == newRouteName) {
+                                    isNewRouteSameAsCurrent = true;
+                                  }
+                                  return true;
+                                });
+
+                                if (!isNewRouteSameAsCurrent) {
+                                  Navigator.pushNamed(context, newRouteName);
+                                }
+                              },
+                              child: Text(
+                                AppLocalizations.of(context)
+                                    .translate('addNewAccount'),
+                                style: TextStyle(
+                                    fontSize: 20,
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold),
+                              )),
+                          SizedBox(height: 10),
+                          InkWell(
+                            onTap: () {
+                              final newRouteName = "/loginUserScreen";
+                              bool isNewRouteSameAsCurrent = false;
+                              Navigator.popUntil(context, (route) {
+                                if (route.settings.name == newRouteName) {
+                                  isNewRouteSameAsCurrent = true;
+                                }
+                                return true;
+                              });
+
+                              if (!isNewRouteSameAsCurrent) {
+                                Navigator.pushNamed(context, newRouteName);
+                              }
+                            },
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Text(
+                                  AppLocalizations.of(context)
+                                      .translate('haveAccount'),
+                                  style: TextStyle(
+                                      fontSize: 18,
+                                      color: HexColor('#49494a'),
+                                      fontWeight: FontWeight.bold),
+                                ),
+                                SizedBox(width: 10),
+                                Text(
+                                  AppLocalizations.of(context)
+                                      .translate('login'),
+                                  style: TextStyle(
+                                      fontSize: 18,
+                                      color: HexColor('#ff5757'),
+                                      fontWeight: FontWeight.w900),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ]),
+                      ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }
-/* : Container(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Row(
-                      mainAxisAlignment:MainAxisAlignment.spaceAround,
-                      children: [
-                        _drawProducts("users",Icons.person),
-                        _codesActive(),
 
-                      ],
-                    ),
-                    SizedBox(height: 10,),
-                    Row(
-                      mainAxisAlignment:MainAxisAlignment.spaceAround,
-                      children: [
-                        _codeNuActive(),
-                        _offer(),
-                      ],
-                    ),
-                    SizedBox(height: 10,),
-                    Row(
-                      mainAxisAlignment:MainAxisAlignment.spaceAround,
-                      children: [
-                        _stores(),
-                        _mode(),
-                      ],
-                    ),
-                     ],
-                ),
-              ),*/
-  Widget _drawProducts(String id , IconData icon ) {
-    return StreamBuilder<QuerySnapshot>(
-      stream: Firestore.instance.collection(id).snapshots(),
-      builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-        if (snapshot.hasError) return new Text('Error: ${snapshot.error}');
-        switch (snapshot.connectionState) {
-          case ConnectionState.waiting:
-            return new Center(
-              child: CircularProgressIndicator(),
-            );
-          default:
-            return Container(
-              alignment: Alignment.center,
-              height: 150,
-              width: 170,
-              decoration: BoxDecoration(borderRadius: BorderRadius.circular(10)
-                ,color: Colors.blue,
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    "${snapshot.data.docs.length.toString()}",
-                    style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold),
-                  ),
-                  SizedBox(width: 10,),
-                  Text("عداد المسجلين",
-                    style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold),
-                  ),
-                ],
-              ),
-            );
+
+  Widget imageSubs({String phone}) {
+    if (Provider.of<AccountProvider>(context).tool == true &&
+        Provider.of<AccountProvider>(context).sub1 == false &&
+        Provider.of<AccountProvider>(context).sub6 == false &&
+        Provider.of<AccountProvider>(context).sub12 == false) {
+      return InkWell(
+        onTap: (){
+
+          final newRouteName = "/sharingScreen";
+        bool isNewRouteSameAsCurrent = false;
+        Navigator.popUntil(context, (route) {
+          if (route.settings.name == newRouteName) {
+            isNewRouteSameAsCurrent = true;
+          }
+          return true;
+        });
+        if (!isNewRouteSameAsCurrent) {
+          Navigator.pushNamed(context, newRouteName);
         }
-      },
-    );
+        },
+        child: Image.asset(
+          "assets/images/m1.png",
+          height: 200,
+          width: MediaQuery.of(context).size.width *0.88 ,
+        ),
+      );
+    } else if (Provider.of<AccountProvider>(context, listen: false).tool ==
+            true &&
+        Provider.of<AccountProvider>(context, listen: false).sub1 == false &&
+        Provider.of<AccountProvider>(context, listen: false).sub6 == true &&
+        Provider.of<AccountProvider>(context, listen: false).sub12 == false) {
+      return StreamBuilder<QuerySnapshot>(
+        stream: FirebaseFirestore.instance
+            .collection('sharing_users')
+            .where("phoneNumber", isEqualTo: phone)
+            .snapshots(),
+        builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+          if (snapshot.hasError) return Container();
+          if (!snapshot.hasData) return Container();
+          switch (snapshot.connectionState) {
+            case ConnectionState.waiting:
+              return Container();
+            default:
+              return snapshot.data.size != 0
+                  ? Container(
+                      child: Column(children: [
+                      Text(
+                        "الوقت المتبقي للاشتراك",
+                        style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 18,
+                            fontWeight: FontWeight.w800),
+                      ),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      Column(
+                          children: snapshot.data.docs.map((e) {
+                        int endTime =
+                            e.data()["endDateTime"].millisecondsSinceEpoch +
+                                1000 * 30;
+                        return CountdownTimer(
+                          endTime: endTime,
+                          widgetBuilder: (_, CurrentRemainingTime time) {
+                            return Directionality(
+                                textDirection: TextDirection.rtl,
+                                child: Text(
+                                  time.days.toString() + " " + "يوم",
+                                  style: TextStyle(
+                                      fontSize: 16,
+                                      letterSpacing: 0.5,
+                                      fontWeight: FontWeight.bold),
+                                ));
+                          },
+                        );
+                      }).toList()),
+                    ]))
+                  : Container(
+                      height: 150,
+                    );
+          }
+        },
+      );
+    } else if (Provider.of<AccountProvider>(context, listen: false).tool ==
+            true &&
+        Provider.of<AccountProvider>(context, listen: false).sub1 == false &&
+        Provider.of<AccountProvider>(context, listen: false).sub6 == false &&
+        Provider.of<AccountProvider>(context, listen: false).sub12 == true) {
+      return widget12m(phone);
+    } else if (Provider.of<AccountProvider>(context, listen: false).tool ==
+            false &&
+        Provider.of<AccountProvider>(context, listen: false).sub1 == false &&
+        Provider.of<AccountProvider>(context, listen: false).sub6 == false &&
+        Provider.of<AccountProvider>(context, listen: false).sub12 == false) {
+      return Container(
+        height: 150,
+      );
+    } else if (Provider.of<AccountProvider>(context, listen: false).tool ==
+            true &&
+        Provider.of<AccountProvider>(context, listen: false).sub1 == true &&
+        Provider.of<AccountProvider>(context, listen: false).sub6 == false &&
+        Provider.of<AccountProvider>(context, listen: false).sub12 == false) {
+      return StreamBuilder<QuerySnapshot>(
+        stream: FirebaseFirestore.instance
+            .collection('sharing_users')
+            .where("phoneNumber", isEqualTo: phone)
+            .snapshots(),
+        builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+          if (snapshot.hasError) return Container();
+          if (!snapshot.hasData) return Container();
+          switch (snapshot.connectionState) {
+            case ConnectionState.waiting:
+              return Container();
+            default:
+              return snapshot.data.size != 0
+                  ? Container(
+                      child: Column(children: [
+                      Text(
+                        "الوقت المتبقي للاشتراك",
+                        style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 18,
+                            fontWeight: FontWeight.w800),
+                      ),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      Column(
+                          children: snapshot.data.docs.map((e) {
+                        int endTime =
+                            e.data()["endDateTime"].millisecondsSinceEpoch +
+                                1000 * 30;
+                        return CountdownTimer(
+                          endTime: endTime,
+                          widgetBuilder: (_, CurrentRemainingTime time) {
+                            return Directionality(
+                                textDirection: TextDirection.rtl,
+                                child: Text(
+                                  time.days.toString() + " " + "يوم",
+                                  style: TextStyle(
+                                      fontSize: 16,
+                                      letterSpacing: 0.5,
+                                      fontWeight: FontWeight.bold),
+                                ));
+                          },
+                        );
+                      }).toList()),
+                    ]))
+                  : Container(
+                      height: 150,
+                    );
+          }
+        },
+      );
+    }
   }
-  Widget _codesActive() {
-    return StreamBuilder<QuerySnapshot>(
-      stream: Firestore.instance.collection('codes').where("close",isEqualTo:true).snapshots(),
+  Widget widget12m(String phone ) {
+    return Center(
+        child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+        StreamBuilder<QuerySnapshot>(
+        stream: FirebaseFirestore.instance
+            .collection('sharing_users')
+            .where("phoneNumber", isEqualTo: phone)
+            .snapshots(),
       builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-        if (snapshot.hasError) return new Text('Error: ${snapshot.error}');
+        if (snapshot.hasError) return Container();
+        if (!snapshot.hasData) return Container();
         switch (snapshot.connectionState) {
           case ConnectionState.waiting:
-            return new Center(
-              child: CircularProgressIndicator(),
-            );
+            return Container();
           default:
-            return Container(
-              alignment: Alignment.center,
-              height: 150,
-              width: 170,
-              decoration: BoxDecoration(borderRadius: BorderRadius.circular(10)
-                ,color: Colors.blue,
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
+            return snapshot.data.size != 0
+                ? Container(
+                child: Column(children: [
                   Text(
-                    "${snapshot.data.docs.length.toString()}",
+                    "الوقت المتبقي للاشتراك",
                     style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold),
+                        color: Colors.black,
+                        fontSize: 18,
+                        fontWeight: FontWeight.w800),
                   ),
-                  SizedBox(width: 10,),
-                  Text("الكواد الستخدم",style: TextStyle(color: Colors.white,fontSize: 18,fontWeight: FontWeight.bold),),
-                ],
-              ),
-            );
-        }
-      },
-    );
-  }
-  Widget _codeNuActive() {
-    return StreamBuilder<QuerySnapshot>(
-      stream: Firestore.instance.collection("codes").where("close",isEqualTo: false).snapshots(),
-      builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-        if (snapshot.hasError) return new Text('Error: ${snapshot.error}');
-        switch (snapshot.connectionState) {
-          case ConnectionState.waiting:
-            return new Center(
-              child: CircularProgressIndicator(),
-            );
-          default:
-            return Container(
-              alignment: Alignment.center,
-              height: 150,
-              width: 170,
-              decoration: BoxDecoration(borderRadius: BorderRadius.circular(10)
-                ,color: Colors.blue,
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    "${snapshot.data.docs.length.toString()}",
-                    style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold),
+                  SizedBox(
+                    height: 10,
                   ),
-                  SizedBox(width: 10,),
-                  Text("الكود غير مستخدام",style: TextStyle(color: Colors.white,fontSize: 18,fontWeight: FontWeight.bold),),
-                ],
-              ),
-            );
-        }
-      },
-    );
-  }
-  Widget _offer() {
-    return StreamBuilder<QuerySnapshot>(
-      stream: Firestore.instance.collection("offers").snapshots(),
-      builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-        if (snapshot.hasError) return new Text('Error: ${snapshot.error}');
-        switch (snapshot.connectionState) {
-          case ConnectionState.waiting:
-            return new Center(
-              child: CircularProgressIndicator(),
-            );
-          default:
-            return Container(
-              alignment: Alignment.center,
+                  Column(
+                      children: snapshot.data.docs.map((e) {
+                        int endTime =
+                            e.data()["endDateTime"].millisecondsSinceEpoch +
+                                1000 * 30;
+                        return CountdownTimer(
+                          endTime: endTime,
+                          widgetBuilder: (_, CurrentRemainingTime time) {
+                            return Directionality(
+                                textDirection: TextDirection.rtl,
+                                child: Text(
+                                  time.days.toString() + " " + "يوم",
+                                  style: TextStyle(
+                                      fontSize: 16,
+                                      letterSpacing: 0.5,
+                                      fontWeight: FontWeight.bold),
+                                ));
+                          },
+                        );
+                      }).toList()),
+
+                ]))
+                : Container(
               height: 150,
-              width: 170,
-              decoration: BoxDecoration(borderRadius: BorderRadius.circular(10)
-                ,color: Colors.blue,
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    "${snapshot.data.docs.length.toString()}",
-                    style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold),
-                  ),
-                  SizedBox(width: 10,),
-                  Text("العروض ",style: TextStyle(color: Colors.white,fontSize: 18,fontWeight: FontWeight.bold),),
-                ],
-              ),
             );
         }
       },
-    );
-  }
-  Widget _stores() {
-    return StreamBuilder<QuerySnapshot>(
-      stream: Firestore.instance.collection("stores").snapshots(),
-      builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-        if (snapshot.hasError) return new Text('Error: ${snapshot.error}');
-        switch (snapshot.connectionState) {
-          case ConnectionState.waiting:
-            return new Center(
-              child: CircularProgressIndicator(),
-            );
-          default:
-            return Container(
-              alignment: Alignment.center,
-              height: 150,
-              width: 170,
-              decoration: BoxDecoration(borderRadius: BorderRadius.circular(10)
-                ,color: Colors.blue,
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    "${snapshot.data.docs.length.toString()}",
-                    style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold),
-                  ),
-                  SizedBox(width: 10,),
-                  Text("المتاجر",style: TextStyle(color: Colors.white,fontSize: 18,fontWeight: FontWeight.bold),),
-                ],
-              ),
-            );
-        }
-      },
-    );
-  }
-  Widget _mode() {
-    return StreamBuilder<QuerySnapshot>(
-      stream: Firestore.instance.collection("tools").snapshots(),
-      builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-        if (snapshot.hasError) return new Text('Error: ${snapshot.error}');
-        switch (snapshot.connectionState) {
-          case ConnectionState.waiting:
-            return new Center(
-              child: CircularProgressIndicator(),
-            );
-          default:
-            return Container(
-              alignment: Alignment.center,
-              height: 150,
-              width: 170,
-              decoration: BoxDecoration(borderRadius: BorderRadius.circular(10)
-                ,color: Colors.blue,
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  SizedBox(width: 10,),
-                  snapshot.data.docs[0]['active_mode'] ==true ?
-                  Text("مدفوع",style: TextStyle(color: Colors.white,fontSize: 18,fontWeight: FontWeight.bold),):
-                  Text("مجاني",style: TextStyle(color: Colors.white,fontSize: 18,fontWeight: FontWeight.bold),),
-                ],
-              ),
-            );
-        }
-      },
-    );
+    ),
+          Text(
+            "يوم",
+            style: TextStyle(
+                color: Colors.black, fontWeight: FontWeight.w800, fontSize: 18),
+          ),
+        SizedBox(
+          height: 60,
+        ), Text(
+   "اضافة فرد من العاىْلة",
+            style: TextStyle(
+                color: Colors.black, fontWeight: FontWeight.w900, fontSize: 20),
+          ),
+        ]));
   }
 }

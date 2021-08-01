@@ -59,8 +59,9 @@ Widget getImageOffer(
                   return !favoriteProvider.getFavoriteId.contains(offerId)
                       ? InkWell(
                           onTap: () {
+
                             favoriteLike(context, offerId);
-                          },
+                            },
                           child: Padding(
                               padding: const EdgeInsets.only(left: 12, top: 12),
                               child: Align(
@@ -241,6 +242,7 @@ Widget getImageOfferCategory(
 }
 
 Future<String> _getImageOfferCategoryPhoto(String id, String filePath) async {
+ print("id $filePath");
   var _urlImage = await FirebaseStorage.instance
       .ref()
       .child('offersCategory')

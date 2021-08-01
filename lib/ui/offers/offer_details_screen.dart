@@ -8,11 +8,14 @@ import 'package:esay/models/store_model.dart';
 import 'package:esay/providers/auth_provider.dart';
 import 'package:esay/providers/bottom_animation_provider.dart';
 import 'package:esay/providers/code_provider.dart';
+import 'package:esay/providers/loading_provider.dart';
 import 'package:esay/providers/share_provider.dart';
 import 'package:esay/services/firestore_database.dart';
 import 'package:esay/widgetEdit/dielog_qr.dart';
 import 'package:esay/widgetEdit/model_f_chack.dart';
+import 'package:esay/widgetEdit/test.dart';
 import 'package:flutter/cupertino.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_countdown_timer/current_remaining_time.dart';
@@ -33,7 +36,6 @@ class OfferDetailsScreen extends StatefulWidget {
   OfferDetailsScreen({this.offerModel, this.storeModel});
   final OfferModel offerModel;
   final StoreModel storeModel;
-
   @override
   _OfferDetailsScreenState createState() => _OfferDetailsScreenState();
 }
@@ -47,14 +49,15 @@ class _OfferDetailsScreenState extends State<OfferDetailsScreen> {
     Future.delayed(Duration(seconds: 0), () async {
       final firestoreDatabase =
           Provider.of<FirestoreDatabase>(context, listen: false);
-      await firestoreDatabase.getCodeDetails(context, widget.offerModel);
       await getImageOffersForShare(context, widget.offerModel.photoName);
     });
   }
+
   @override
   void dispose() {
     super.dispose();
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -64,120 +67,92 @@ class _OfferDetailsScreenState extends State<OfferDetailsScreen> {
           int endTime =
               codeProvider.getTimestamp.millisecondsSinceEpoch + 1000 * 30;
           return Container(
-            color: Color(0xff2c6bec),
-            width: MediaQuery.of(context).size.width,
-            padding: EdgeInsets.only(top: 0),
-            child: codeProvider.getCode != ""
-                ? Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-             children: [
-                    Image.asset(
-                      'assets/images/timerNew.png',
-                      width: 25,
-                    ),
-                    SizedBox(
-                      width: 10,
-                    ),
-                    Directionality(
-                        textDirection: TextDirection.ltr,
-                        child: CountdownTimer(
-                          endTime: endTime,
-                          widgetBuilder: (_, CurrentRemainingTime time) {
-                            int hours;
-                            if (time.days != null) {
-                              hours = (time.days * 24) + time.hours;
-                            }
-                            return time.days == null
-                                ? Text(
-                                    time.hours == null
-                                        ? '0    :    ${time.min}    :    ${time.sec}'
-                                        : time.min == null
-                                            ? '0    :    0    :    ${time.sec}'
-                                            : '${time.hours}    :    ${time.min}    :    ${time.sec}',
-                                    style: TextStyle(
-                                        color: Colors.grey[300],
-                                        fontSize: 17,
-                                        fontWeight: FontWeight.bold),
-                                  )
-                                : Text(
-                                    time.days == null
-                                        ? '0    : 0    : ${time.min}    :    ${time.sec}'
-                                        : time.hours == null
-                                            ? '0    :    ${time.min}    :    ${time.sec}'
-                                            : time.min == null
-                                                ? '0    :    0    :    ${time.sec}'
-                                                : ' $hours  :    ${time.min}    :    ${time.sec}',
-                                    style: TextStyle(
-                                        color: Colors.grey[300],
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.bold),
-                                  );
-                          },
-                        )),
-               SizedBox(width: 30,),
-               InkWell(
-                 onTap: (){
-                   showDialog(
-                       context: context,
-                       builder: (BuildContext context) {
-                         return CustomDialogQr(
-                           title: "رمز أيزي الخاص بك لهذا العرض هو",
-                           text: "شكرا !",
-                           code: AppLocalizations.of(context).translate("code5") +
-                               " " +
-                               codeProvider.getCode,
-                         );
-                       });
-                 },
-                 child: QrImage(
-                   data: AppLocalizations.of(context).translate("code5") +
-                       " " +
-                       codeProvider.getCode,
-                   version: QrVersions.auto,
-                   size: 60.0,
-                   foregroundColor: Colors.white,
-                 ),
-               ),
-                  ])
-                : FlatButton(
-                    color: HexColor('#2c6bec'),
-                    child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text(
-                          AppLocalizations.of(context).translate("getCode"),
-                          style: TextStyle(
-                              fontSize: 25,
-                              color: Colors.white,
-                              fontWeight: FontWeight.w900),
-                        )),
-                    onPressed: () async {
-                      final authProvider =
-                          Provider.of<AuthProvider>(context, listen: false);
-                      final cIndexProvider =
-                          Provider.of<CIndexProvider>(context, listen: false);
-                      if (authProvider.userModel.phoneNumber == "") {
-                        Navigator.of(context).pop();
-                        cIndexProvider.changeCIndex(3);
-                        cIndexProvider.changeNameNav("account");
-                        final newRouteName = "/accountScreen";
-                        bool isNewRouteSameAsCurrent = false;
-                        Navigator.popUntil(context, (route) {
-                          if (route.settings.name == newRouteName) {
-                            isNewRouteSameAsCurrent = true;
-                          }
-                          return true;
-                        });
-                        if (!isNewRouteSameAsCurrent) {
-                          Navigator.pushNamed(context, newRouteName);
-                        }
-                      } else {
+              color: HexColor('#2c6bec'),
+              width: MediaQuery.of(context).size.width,
+              padding: codeProvider.getCode != ""
+                  ? EdgeInsets.only(top: 8)
+                  : EdgeInsets.only(top: 0),
+              child: codeProvider.getCode != ""
+                  ? Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                          Image.asset(
+                            'assets/images/timerNew.png',
+                            width: 25,
+                          ),
+                          SizedBox(
+                            width: 10,
+                          ),
+                          Directionality(
+                              textDirection: TextDirection.ltr,
+                              child: CountdownTimer(
+                                endTime: endTime,
+                                widgetBuilder: (_, CurrentRemainingTime time) {
+                                  int hours;
+                                  if (time.days != null) {
+                                    hours = (time.days * 24) + time.hours;
+                                  }
+                                  return time.days == null
+                                      ? Text(
+                                          time.hours == null
+                                              ? '0    :    ${time.min}    :    ${time.sec}'
+                                              : time.min == null
+                                                  ? '0    :    0    :    ${time.sec}'
+                                                  : '${time.hours}    :    ${time.min}    :    ${time.sec}',
+                                          style: TextStyle(
+                                              color: Colors.grey[300],
+                                              fontSize: 17,
+                                              fontWeight: FontWeight.bold),
+                                        )
+                                      : Text(
+                                          time.days == null
+                                              ? '0    : 0    : ${time.min}    :    ${time.sec}'
+                                              : time.hours == null
+                                                  ? '0    :    ${time.min}    :    ${time.sec}'
+                                                  : time.min == null
+                                                      ? '0    :    0    :    ${time.sec}'
+                                                      : ' $hours  :    ${time.min}    :    ${time.sec}',
+                                          style: TextStyle(
+                                              color: Colors.grey[300],
+                                              fontSize: 18,
+                                              fontWeight: FontWeight.bold),
+                                        );
+                                },
+                              )),
+                          SizedBox(
+                            width: 30,
+                          ),
+                          InkWell(
+                            onTap: () {
+                              showDialog(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return CustomDialogQr(
+                                      title: "رمز أيزي الخاص بك لهذا العرض هو",
+                                      text: "شكرا !",
+                                      code: AppLocalizations.of(context)
+                                              .translate("code5") +
+                                          " " +
+                                          codeProvider.getCode,
+                                    );
+                                  });
+                            },
+                            child: QrImage(
+                              data: AppLocalizations.of(context)
+                                      .translate("code5") +
+                                  " " +
+                                  codeProvider.getCode,
+                              version: QrVersions.auto,
+                              size: 60.0,
+                              foregroundColor: Colors.white,
+                            ),
+                          ),
+                        ])
+                  : _dis(widget.offerModel.id)
+              //codeProvider.getCode != ""
 
-                        GetCodeEdit.check_sub(
-                            context, widget.offerModel, widget.storeModel);
-                      }
-                    }),
-          );
+              );
         }),
         body: ListView(
           padding: EdgeInsets.all(0),
@@ -250,34 +225,13 @@ class _OfferDetailsScreenState extends State<OfferDetailsScreen> {
                       child: Wrap(
                         children: [
                           Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            mainAxisAlignment: widget.storeModel.menu.isEmpty &&
+                                    widget.storeModel.phone.isEmpty
+                                ? MainAxisAlignment.center
+                                : MainAxisAlignment.spaceEvenly,
                             children: [
-                              widget.storeModel.menu == ""
-                                  ? Container(
-                                      color: Colors.transparent,
-                                      child: Row(
-                                        children: [
-                                          Image.asset(
-                                              "assets/images/menu and details.png",
-                                              width: 30,
-                                              color: Colors.transparent),
-                                          SizedBox(width: 5),
-                                          Text(
-                                            widget.storeModel.category ==
-                                                    "مطاعم"
-                                                ? AppLocalizations.of(context)
-                                                    .translate("menu")
-                                                : AppLocalizations.of(context)
-                                                    .translate(
-                                                        "offersAndDetails"),
-                                            style: TextStyle(
-                                                fontSize: 15,
-                                                fontWeight: FontWeight.bold,
-                                                color: Colors.transparent),
-                                          ),
-                                        ],
-                                      ),
-                                    )
+                              widget.storeModel.menu.isEmpty
+                                  ? Container()
                                   : InkWell(
                                       onTap: () async {
                                         showProgressDialog(
@@ -292,6 +246,7 @@ class _OfferDetailsScreenState extends State<OfferDetailsScreen> {
                                         dismissProgressDialog();
                                       },
                                       child: Container(
+                                        //padding: EdgeInsets.only(right: 10),
                                         child: Row(
                                           children: [
                                             Image.asset(
@@ -316,35 +271,15 @@ class _OfferDetailsScreenState extends State<OfferDetailsScreen> {
                                         ),
                                       ),
                                     ),
-                              widget.storeModel.phone == ""
-                                  ? Container(
-                                      color: Colors.transparent,
-                                      child: Row(
-                                        children: [
-                                          Image.asset(
-                                            "assets/images/phone 1st.png",
-                                            width: 30,
-                                            color: Colors.transparent,
-                                          ),
-                                          SizedBox(width: 5),
-                                          Text(
-                                            AppLocalizations.of(context)
-                                                .translate("call"),
-                                            style: TextStyle(
-                                              fontSize: 15,
-                                              fontWeight: FontWeight.bold,
-                                              color: Colors.transparent,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    )
+                              widget.storeModel.phone.isEmpty
+                                  ? Container()
                                   : InkWell(
                                       onTap: () async {
                                         await launchCaller(
                                             context, widget.storeModel.phone);
                                       },
                                       child: Container(
+                                        width: 100,
                                         child: Row(
                                           children: [
                                             Image.asset(
@@ -493,63 +428,12 @@ class _OfferDetailsScreenState extends State<OfferDetailsScreen> {
                         ]);
                       }).toList(),
                     )),
-                    Container(
-                        alignment: Alignment.centerRight,
-                        height: 50,
-                        child: checkItem()),
                   ],
                 ),
               ),
             ),
           ],
         ));
-  }
-
-  Widget checkItem() {
-    FirebaseFirestore.instance
-        .collection("codes")
-        .where("store_id", isEqualTo: widget.offerModel.id)
-        .where("user_id", isEqualTo: "+970500027047")
-        .get()
-        .then((num) {
-      FirebaseFirestore.instance
-          .collection("users")
-          .doc("+970598427047")
-          .get()
-          .then((subs) {
-        int count = num.docs.length.toInt();
-        print(count);
-        if (subs["subscription1"] == true) {
-          print(subs["subscription_1"]);
-          if (subs["subscription_1"] <= count) {
-            print("this Offer is not have code for this store");
-          } else {
-            return Text((subs["subscription_1"] - count).toString());
-          }
-        }
-        if (subs["subscription12"] == true) {
-          print(subs["subscription_12m"]);
-          if (subs["subscription_12m"] <= count) {
-            print("this Offer is not have code for this store");
-          } else {
-            return Text((subs["subscription_12m"] - count).toString());
-          }
-        } else if (subs["subscription6"] == true) {
-          print(subs["subscription_6m"]);
-          if (subs["subscription_6m"] <= count) {
-            print("11");
-          } else {
-            print("name:${subs["subscription_6m"] - count}");
-            return Container(
-                height: 30,
-                child: Text(
-                  (subs["subscription_6m"] - count).toString(),
-                  style: TextStyle(color: Colors.black, fontSize: 30),
-                ));
-          }
-        }
-      });
-    });
   }
 
   Widget checkPat() {
@@ -591,5 +475,175 @@ class _OfferDetailsScreenState extends State<OfferDetailsScreen> {
         ),
       );
     }
+  }
+
+  Widget _dis(String offerId) {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final cIndexProvider = Provider.of<CIndexProvider>(context, listen: false);
+    return Container(
+      width: MediaQuery.of(context).size.width,
+      height: 70,
+      child: FutureBuilder(
+          future: FirebaseFirestore.instance
+              .collection('codes')
+              .where("user_id", isEqualTo: authProvider.userModel.phoneNumber)
+              .where('offerId', isEqualTo: offerId)
+              .where('close', isEqualTo: false)
+              .get(),
+          builder: (context, snap) {
+            if (snap.data != null && snap.data.size != 0) {
+              var _endDate =
+                  snap.data.docs[0]['endDateTime'].millisecondsSinceEpoch +
+                      1000 * 30;
+              return snap.data.docs[0]['endDateTime']
+                      .toDate()
+                      .isAfter(DateTime.now())
+                  ? Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                          Image.asset(
+                            'assets/images/timerNew.png',
+                            width: 25,
+                          ),
+                          SizedBox(
+                            width: 10,
+                          ),
+                          Directionality(
+                              textDirection: TextDirection.ltr,
+                              child: CountdownTimer(
+                                endTime: _endDate,
+                                widgetBuilder: (_, CurrentRemainingTime time) {
+                                  int hours;
+                                  if (time.days != null) {
+                                    hours = (time.days * 24) + time.hours;
+                                  }
+                                  return time.days == null
+                                      ? Text(
+                                          time.hours == null
+                                              ? '0    :    ${time.min}    :    ${time.sec}'
+                                              : time.min == null
+                                                  ? '0    :    0    :    ${time.sec}'
+                                                  : '${time.hours}    :    ${time.min}    :    ${time.sec}',
+                                          style: TextStyle(
+                                              color: Colors.grey[300],
+                                              fontSize: 17,
+                                              fontWeight: FontWeight.bold),
+                                        )
+                                      : Text(
+                                          time.days == null
+                                              ? '0    : 0    : ${time.min}    :    ${time.sec}'
+                                              : time.hours == null
+                                                  ? '0    :    ${time.min}    :    ${time.sec}'
+                                                  : time.min == null
+                                                      ? '0    :    0    :    ${time.sec}'
+                                                      : ' $hours  :    ${time.min}    :    ${time.sec}',
+                                          style: TextStyle(
+                                              color: Colors.grey[300],
+                                              fontSize: 18,
+                                              fontWeight: FontWeight.bold),
+                                        );
+                                },
+                              )),
+                          SizedBox(
+                            width: 30,
+                          ),
+                          InkWell(
+                            onTap: () {
+                              showDialog(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return CustomDialogQr(
+                                      title: "رمز أيزي الخاص بك لهذا العرض هو",
+                                      text: "شكرا !",
+                                      code: "${snap.data.docs[0]['code']}",
+                                    );
+                                  });
+                            },
+                            child: QrImage(
+                              data: "${snap.data.docs[0]['code']}",
+                              version: QrVersions.auto,
+                              size: 60.0,
+                              foregroundColor: Colors.white,
+                            ),
+                          ),
+                        ])
+                  : FlatButton(
+                      color: HexColor('#2c6bec'),
+                      child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text(
+                            AppLocalizations.of(context).translate("getCode"),
+                            style: TextStyle(
+                                fontSize: 25,
+                                color: Colors.white,
+                                fontWeight: FontWeight.w900),
+                          )),
+                      onPressed: () async {
+                        if (authProvider.userModel.phoneNumber == "") {
+                          Navigator.of(context).pop();
+                          cIndexProvider.changeCIndex(3);
+                          cIndexProvider.changeNameNav("account");
+                          final newRouteName = "/accountScreen";
+                          bool isNewRouteSameAsCurrent = false;
+                          Navigator.popUntil(context, (route) {
+                            if (route.settings.name == newRouteName) {
+                              isNewRouteSameAsCurrent = true;
+                            }
+                            return true;
+                          });
+
+                          if (!isNewRouteSameAsCurrent) {
+                            Navigator.pushNamed(context, newRouteName);
+                          }
+                        } else {
+                          // showProgressDialog(
+                          //     context: context,
+                          //     loadingText: "",
+                          //     backgroundColor: HexColor('#2c6bec'));
+                          GetCodeEdit.check_sub(
+                              context, widget.offerModel, widget.storeModel);
+                        }
+                      });
+            } else {
+              return FlatButton(
+                  color: HexColor('#2c6bec'),
+                  child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                        AppLocalizations.of(context).translate("getCode"),
+                        style: TextStyle(
+                            fontSize: 25,
+                            color: Colors.white,
+                            fontWeight: FontWeight.w900),
+                      )),
+                  onPressed: () async {
+                    if (authProvider.userModel.phoneNumber == "") {
+                      Navigator.of(context).pop();
+                      cIndexProvider.changeCIndex(3);
+                      cIndexProvider.changeNameNav("account");
+                      final newRouteName = "/accountScreen";
+                      bool isNewRouteSameAsCurrent = false;
+                      Navigator.popUntil(context, (route) {
+                        if (route.settings.name == newRouteName) {
+                          isNewRouteSameAsCurrent = true;
+                        }
+                        return true;
+                      });
+                      if (!isNewRouteSameAsCurrent) {
+                        Navigator.pushNamed(context, newRouteName);
+                      }
+                    } else {
+                      // showProgressDialog(
+                      //     context: context,
+                      //     loadingText: "",
+                      //     backgroundColor: HexColor('#2c6bec'));
+                      GetCodeEdit.check_sub(
+                          context, widget.offerModel, widget.storeModel);
+                    }
+                  });
+            }
+          }),
+    );
   }
 }

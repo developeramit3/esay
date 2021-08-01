@@ -84,7 +84,7 @@ class _AuthUserScreenState extends State<AuthUserScreen> {
                               textAlign: TextAlign.end,
                               controller: _phoneController,
                               inputFormatters: [
-                                LengthLimitingTextInputFormatter(11),
+                                LengthLimitingTextInputFormatter(9),
                               ],
                               validator: (value) {
                                 if (value.isEmpty || value.length < 9) {
@@ -94,7 +94,7 @@ class _AuthUserScreenState extends State<AuthUserScreen> {
                                 return null;
                               },
                               style: TextStyle(
-                                  color: Colors.grey,
+                                  color: Colors.black,
                                   fontWeight: FontWeight.bold,
                                   letterSpacing: 0.5),
                               keyboardType: TextInputType.number,
@@ -142,15 +142,6 @@ class _AuthUserScreenState extends State<AuthUserScreen> {
                             //             style: TextStyle(
                             //                 fontWeight: FontWeight.bold))),
                             //     value: "+2"),
-
-                            DropdownMenuItem(
-                              child: Directionality(
-                                  textDirection: TextDirection.ltr,
-                                  child: Text("+20",
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.bold))),
-                              value: "+2",
-                            ),
                           ],
                           onChanged: (value) {
                             setState(() {

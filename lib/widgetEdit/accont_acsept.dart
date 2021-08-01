@@ -8,16 +8,56 @@ class PrivacyPolicy extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: appBar(context, "Home", showBack: false),
-      body: Center(
-        child: Column(
-          mainAxisAlignment:MainAxisAlignment.center,
-          children: [
-            Center(
-              child: Text(text),
+      appBar: appBar(context, "Home", showBack: true),
+      body: Column(
+        // mainAxisAlignment:MainAxisAlignment.center,
+        children: [
+          SizedBox(
+            height: 10,
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                "سياسة الخصوصية",
+                style: TextStyle(fontSize: 27, fontWeight: FontWeight.bold),
+              ),
+              SizedBox(
+                width: 5,
+              ),
+              Text(
+                "المملة",
+                style: TextStyle(
+                    fontSize: 27,
+                    fontWeight: FontWeight.bold,
+                    decoration: TextDecoration.lineThrough),
+              ),
+            ],
+          ),
+          SizedBox(
+            height: 15,
+          ),
+          Text(
+            "بس لزم تكون موجودة",
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
+          ),
+          Container(
+            padding: EdgeInsets.all(10),
+            alignment: Alignment.centerRight,
+            child: Column(
+              children: [
+                Text("النص تاعها....",
+                    style: TextStyle(
+                      fontSize: 20,
+                    )),
+                Text("النص تاعها....",
+                    style: TextStyle(
+                      fontSize: 20,
+                    ))
+              ],
             ),
-          ],
-        ),
+          )
+        ],
       ),
     );
   }

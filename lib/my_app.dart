@@ -18,6 +18,7 @@ import 'providers/auth_provider.dart';
 import 'providers/language_provider.dart';
 import 'routes.dart';
 import 'services/firestore_database.dart';
+import 'widgetEdit/test.dart';
 
 class MyApp extends StatefulWidget {
   const MyApp({Key key, this.databaseBuilder}) : super(key: key);
@@ -31,13 +32,16 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   final String title = "Easy";
-final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
+  final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-  _firebaseMessaging.subscribeToTopic("Admin");
+    SetNot.setNot(context);
+    SetNot.ctogryNumber(context);
+    _firebaseMessaging.subscribeToTopic("Admin");
   }
+
   @override
   Widget build(BuildContext context) {
     final splashPovider = Provider.of<SplashPovider>(context, listen: false);
@@ -101,15 +105,15 @@ final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
                             styleTextUnderTheLoader: TextStyle(),
                             photoSize: 100.0,
                             loaderColor: Colors.blue[900],
-                            useLoader: true,
+                            useLoader: false,
                             navigateAfterSeconds: Consumer<AuthProvider>(
                               builder: (_, authProviderRef, __) {
                                 if (userSnapshot.connectionState ==
                                     ConnectionState.active) {
                                   return userSnapshot.hasData
                                       ? HomeScreen(
-                            title: title,
-                          )
+                                          title: title,
+                                        )
                                       : WelcomeScreen();
                                 }
                                 return Material(

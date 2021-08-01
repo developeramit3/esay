@@ -28,11 +28,10 @@ class _StoreConfirmationScreenState extends State<StoreConfirmationScreen> {
   TextEditingController _codeController = TextEditingController(text: "");
   TextEditingController _beforOfferController = TextEditingController(text: "");
   TextEditingController _afterOfferController = TextEditingController(text: "");
-String code;
+  String code;
   @override
   Widget build(BuildContext context) {
     final codeProvider = Provider.of<CodeProvider>(context, listen: false);
-
     return StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance
             .collection('stores')
@@ -82,33 +81,39 @@ String code;
                           child: Theme(
                             data: ThemeData(primaryColor: Colors.blue),
                             child: TextField(
+                              inputFormatters: [
+                                LengthLimitingTextInputFormatter(6),
+                              ],
                               textAlign: TextAlign.end,
                               style: TextStyle(
-                                  color: Colors.blueGrey[200],
+                                  color: Colors.black,
                                   fontWeight: FontWeight.bold,
                                   letterSpacing: 0.5),
                               keyboardType: TextInputType.number,
                               controller: _codeController,
                               decoration: InputDecoration(
-                               icon:IconButton(icon:Icon(Icons.qr_code_scanner_rounded,size: 30,color: Colors.black,),
-                               onPressed: () async {
-                                   try {
-                                     final qrCode = await FlutterBarcodeScanner.scanBarcode(
-                                       '#ff6666',
-                                       'Cancel',
-                                       true,
-                                       ScanMode.QR,
-                                     );
-                                     if (!mounted) return;
-                                     setState(() {
-                                      code = qrCode;
-                                      _codeController.text= qrCode;
-                                     });
-                                   } on PlatformException {
-                                     code = 'Failed to get platform version.';
-                                   }
-                                 }
-                               ),
+                                icon: InkWell(
+                                    child: Image.asset('assets/images/QR scan.png',height: 30,width: 30,),
+                                    onTap: () async {
+                                      try {
+                                        final qrCode =
+                                            await FlutterBarcodeScanner
+                                                .scanBarcode(
+                                          '#ff6666',
+                                          'Cancel',
+                                          true,
+                                          ScanMode.QR,
+                                        );
+                                        if (!mounted) return;
+                                        setState(() {
+                                          code = qrCode;
+                                          _codeController.text = qrCode;
+                                        });
+                                      } on PlatformException {
+                                        code =
+                                            'Failed to get platform version.';
+                                      }
+                                    }),
                                 hintText: "Enter the code",
                                 enabledBorder: UnderlineInputBorder(
                                   borderSide:
@@ -175,7 +180,7 @@ String code;
                             child: TextField(
                               textAlign: TextAlign.end,
                               style: TextStyle(
-                                  color: Colors.grey,
+                                  color: Colors.black,
                                   fontWeight: FontWeight.bold,
                                   letterSpacing: 0.5),
                               keyboardType: TextInputType.number,
@@ -214,7 +219,7 @@ String code;
                             child: TextField(
                               textAlign: TextAlign.end,
                               style: TextStyle(
-                                  color: Colors.grey,
+                                  color: Colors.black,
                                   fontWeight: FontWeight.bold,
                                   letterSpacing: 0.5),
                               keyboardType: TextInputType.number,
@@ -375,7 +380,7 @@ String code;
                                           listen: false);
                                   await firestoreDatabase.calcDiscountEasy(
                                       context,
-                                      data[0]["total"],
+                                      data[0]["totalNow"],
                                       data[0]["discount"],
                                       data[0]["easyCost"]);
                                 },
@@ -404,7 +409,7 @@ String code;
       padding: EdgeInsets.all(40),
       height: 280,
       child: GridView.count(
-        physics: ScrollPhysics(),
+        physics: NeverScrollableScrollPhysics(),
         childAspectRatio: 1.5,
         crossAxisCount: 2,
         crossAxisSpacing: 50,

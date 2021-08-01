@@ -1,5 +1,6 @@
 import 'package:esay/functions/favorite.dart';
 import 'package:esay/services/firestore_database.dart';
+import 'package:esay/widgetEdit/test.dart';
 import 'package:esay/widgets/navbar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -29,6 +30,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
+    SetNot.getDataUsers(context);
     storageCodes.ready.then((value) {
       print(value);
     });

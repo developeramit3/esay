@@ -8,12 +8,12 @@ import '../app_localizations.dart';
 import '../providers/auth_provider.dart';
 import '../widgets/appbar.dart';
 import 'package:esay/widgetEdit/accont_acsept.dart';
+import 'package:esay/widgetEdit/terms_of_use/terms_of_use.dart';
 
 class WelcomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
-
     return Scaffold(
       appBar: appBar(context, "Home", showBack: false),
       body: SingleChildScrollView(
@@ -76,43 +76,54 @@ class WelcomeScreen extends StatelessWidget {
                   fontSize: 16, color: HexColor('#49494a'), wordSpacing: -1),
             ),
             SizedBox(
-              height: 10,
+              height: 35,
             ),
             Column(
               children: [
-                InkWell(
-                    onTap: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (_) => PrivacyPolicy(
-                                    text: "سياسة الاستخدام",
-                                  )));
-                    },
-                    child: Text('سياسة الاستخدام  ؟',style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w400,
-                    ),
-                    ),),
-                SizedBox(
-                  height: 5,
+                Text(
+                  "عند الضغط على متابعة فانك توافق على",
+                  style: TextStyle(
+                    color: HexColor("#49494a"),
+                  ),
                 ),
-                InkWell(
-                    onTap: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (_) => PrivacyPolicy(
-                                    text: "سياسة الخصوصية",
-                                  )));
-                    },
-                    child: Text(
-                      'سياسة الخصوصية  ؟',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w400,
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    InkWell(
+                      onTap: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => PrivacyPolicy(
+                                      text: 'سياسة الخصوصية و شروط الاستخدام',
+                                    )));
+                      },
+                      child: Text(
+                        "سياسة الخصوصية و ",
+                        style: TextStyle(
+                          color: HexColor("#49494a"),
+                          decoration: TextDecoration.underline,
+                        ),
                       ),
-                    )),
+                    ),
+                    InkWell(
+                      onTap: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => TermsOfUse()));
+                      },
+                      child: Text(
+                        " شروط الاستخدام",
+                        style: TextStyle(
+                          color: HexColor("#49494a"),
+                          decoration: TextDecoration.underline,
+                        ),
+                      ),
+                    )
+                  ],
+                ),
               ],
             ),
           ],

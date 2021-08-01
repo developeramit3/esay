@@ -5,6 +5,7 @@ import 'package:esay/widgets/loading.dart';
 import 'package:esay/widgets/show_toast.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:provider/provider.dart';
 
@@ -48,7 +49,7 @@ class _LoginStoreScreenState extends State<LoginStoreScreen> {
                       child: TextField(
                         textAlign: TextAlign.end,
                         style: TextStyle(
-                            color: Colors.grey,
+                            color: Colors.black,
                             fontWeight: FontWeight.bold,
                             letterSpacing: 0.5),
                         keyboardType: TextInputType.name,
@@ -84,9 +85,12 @@ class _LoginStoreScreenState extends State<LoginStoreScreen> {
                         child: Directionality(
                           textDirection: TextDirection.ltr,
                           child: TextField(
+                            inputFormatters: [
+                              LengthLimitingTextInputFormatter(6),
+                            ],
                             textAlign: TextAlign.start,
                             style: TextStyle(
-                                color: Colors.grey,
+                                color: Colors.black,
                                 fontWeight: FontWeight.bold,
                                 letterSpacing: 0.5),
                             keyboardType: TextInputType.name,

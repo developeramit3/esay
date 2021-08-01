@@ -8,6 +8,7 @@ import 'package:esay/widgets/validate_phone.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:provider/provider.dart';
 import '../../app_localizations.dart';
@@ -25,6 +26,8 @@ class _StoreSharingScreenState extends State<StoreSharingScreen> {
   TextEditingController _phoneController;
   String countryCode = "+970";
   int tab = 1;
+  int cont = 0;
+  String codeDs;
   final _formKey = GlobalKey<FormState>();
   final FocusNode _phoneFocus = FocusNode();
 
@@ -92,7 +95,7 @@ class _StoreSharingScreenState extends State<StoreSharingScreen> {
                           return null;
                         },
                         style: TextStyle(
-                            color: Colors.grey,
+                            color: Colors.black,
                             fontWeight: FontWeight.bold,
                             letterSpacing: 0.5),
                         keyboardType: TextInputType.number,
@@ -190,7 +193,8 @@ class _StoreSharingScreenState extends State<StoreSharingScreen> {
                       InkWell(
                         onTap: () {
                           setState(() {
-                            tab = 159427047;
+                            tab = 1;
+                            cont = snapshot.data.docs[0]['12month'];
                           });
                         },
                         child: Container(
@@ -211,11 +215,11 @@ class _StoreSharingScreenState extends State<StoreSharingScreen> {
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
                                 Text(
-                                  "12 شهر",
+                                  "12 أشهر",
                                   style: TextStyle(fontSize: 22),
                                 ),
                                 Text(
-                                  "${snapshot.data.docs[0]['12month']} شيكل ",
+                                  "${snapshot.data.docs[0]['12month'].toString()} شيكل ",
                                 )
                               ],
                             ),
@@ -229,6 +233,7 @@ class _StoreSharingScreenState extends State<StoreSharingScreen> {
                           }
                           setState(() {
                             tab = 2;
+                            cont = snapshot.data.docs[0]['6month'];
                           });
                         },
                         child: Container(
@@ -248,7 +253,7 @@ class _StoreSharingScreenState extends State<StoreSharingScreen> {
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
                               Text(
-                                "6 شهر",
+                                "6 أشهر",
                                 style: TextStyle(fontSize: 22),
                               ),
                               Text(
@@ -265,6 +270,7 @@ class _StoreSharingScreenState extends State<StoreSharingScreen> {
                           }
                           setState(() {
                             tab = 3;
+                            cont =snapshot.data.docs[0]['1month'];
                           });
                         },
                         child: Container(
@@ -284,7 +290,7 @@ class _StoreSharingScreenState extends State<StoreSharingScreen> {
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
                               Text(
-                                "1 شهر",
+                                "1 أشهر",
                                 style: TextStyle(fontSize: 22),
                               ),
                               Text(
@@ -332,15 +338,39 @@ class _StoreSharingScreenState extends State<StoreSharingScreen> {
                   child: Theme(
                     data: ThemeData(primaryColor: Colors.blue),
                     child: TextField(
+                      inputFormatters: [
+                        LengthLimitingTextInputFormatter(9),
+                      ],
                       textAlign: TextAlign.end,
                       style: TextStyle(
-                          color: Colors.blueGrey[200],
+                          color: Colors.black,
                           fontWeight: FontWeight.bold,
                           letterSpacing: 0.5),
                       keyboardType: TextInputType.number,
                       enabled: tab == 1 ? true : false,
                       controller: _codeStoreController,
                       decoration: InputDecoration(
+                        icon: InkWell(
+                            child: Image.asset('assets/images/QR scan.png',height: 30,width: 30,),
+                            onTap: () async {
+                              try {
+                                final qrCode =
+                                await FlutterBarcodeScanner
+                                    .scanBarcode(
+                                  '#ff6666',
+                                  'Cancel',
+                                  true,
+                                  ScanMode.QR,
+                                );
+                                if (!mounted) return;
+                                setState(() {
+                                  codeDs = qrCode;
+                                  _codeStoreController.text = qrCode;
+                                });
+                              } on PlatformException {
+                                codeDs = 'Failed to get platform version.';
+                              }
+                            }),
                         hintText: AppLocalizations.of(context)
                                 .translate('storeShare6') +
                             " "
@@ -412,13 +442,13 @@ class _StoreSharingScreenState extends State<StoreSharingScreen> {
                             double calc;
                             double easyCost;
                             if (tab == 1) {
-                              calc = 150.0 - 5.0;
+                              calc = cont - 5.0;
                               easyCost = storePovider.getEasyCost + calc;
                             } else if (tab == 2) {
-                              calc = 110.0 - 3.0;
+                              calc = cont - 3.0;
                               easyCost = storePovider.getEasyCost + calc;
                             } else {
-                              calc = 20.0 - 2.0;
+                              calc = cont - 2.0;
                               easyCost = storePovider.getEasyCost + calc;
                             }
                             String code = _codeStoreController.text;
@@ -427,9 +457,14 @@ class _StoreSharingScreenState extends State<StoreSharingScreen> {
                                 : tab == 2
                                     ? 180
                                     : 30;
+                            print(days);
+                            print(calc);
+                            print(code);
                             validatePhone(
                                 context,
+                                _codeStoreController.text.trim(),
                                 code,
+
                                 phone,
                                 widget.storeModel.id,
                                 days,
@@ -437,7 +472,6 @@ class _StoreSharingScreenState extends State<StoreSharingScreen> {
                                 easyCost.toStringAsFixed(1),
                                 widget.scaffoldKey,
                                 widget.storeModel.name);
-
                             _phoneController.clear();
                             _codeStoreController.clear();
                           }
@@ -450,6 +484,6 @@ class _StoreSharingScreenState extends State<StoreSharingScreen> {
                               fontWeight: FontWeight.bold),
                         ));
               })),
-        ]));
+        ]));//598427047
   }
 }

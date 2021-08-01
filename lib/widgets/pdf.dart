@@ -14,7 +14,7 @@ class _PdfReadFileState extends State<PdfReadFile> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar:appBar(context, "Home", showBack: false),
+      appBar:appBar(context, "Home", showBack: true),
       body:  Center(
           child: PDFViewer(document:widget.document)),
     );

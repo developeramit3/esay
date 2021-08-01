@@ -1,9 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:esay/my_app.dart';
 import 'package:esay/providers/bottom_animation_provider.dart';
 import 'package:esay/providers/splash_provider.dart';
+import 'package:esay/widgetEdit/test.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_restart/flutter_restart.dart';
 import 'package:provider/provider.dart';
 
 import '../app_localizations.dart';
@@ -123,6 +126,7 @@ class AuthProvider extends ChangeNotifier {
         });
 
         if (!isNewRouteSameAsCurrent) {
+          await SetNot.getDataUsers(context);
           Navigator.pushNamed(context, newRouteName);
         }
       };
@@ -202,7 +206,8 @@ class AuthProvider extends ChangeNotifier {
         });
 
         if (!isNewRouteSameAsCurrent) {
-          Navigator.pushNamed(context, newRouteName);
+          SetNot.getDataUsers(context);
+          await Navigator.pushNamed(context, newRouteName);
         }
         return _userFromFirebase(user);
       }
