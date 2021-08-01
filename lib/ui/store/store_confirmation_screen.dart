@@ -29,6 +29,7 @@ class _StoreConfirmationScreenState extends State<StoreConfirmationScreen> {
   TextEditingController _beforOfferController = TextEditingController(text: "");
   TextEditingController _afterOfferController = TextEditingController(text: "");
   String code;
+  bool check_code = false;
   @override
   Widget build(BuildContext context) {
     final codeProvider = Provider.of<CodeProvider>(context, listen: false);
@@ -93,7 +94,11 @@ class _StoreConfirmationScreenState extends State<StoreConfirmationScreen> {
                               controller: _codeController,
                               decoration: InputDecoration(
                                 icon: InkWell(
-                                    child: Image.asset('assets/images/QR scan.png',height: 30,width: 30,),
+                                    child: Image.asset(
+                                      'assets/images/QR scan.png',
+                                      height: 30,
+                                      width: 30,
+                                    ),
                                     onTap: () async {
                                       try {
                                         final qrCode =
@@ -109,6 +114,18 @@ class _StoreConfirmationScreenState extends State<StoreConfirmationScreen> {
                                           code = qrCode;
                                           _codeController.text = qrCode;
                                         });
+                                        if (_codeController.text.isNotEmpty) {
+                                          print(
+                                              "this is sore id ${widget.storeModel.id}");
+                                          final firestoreDatabase =
+                                              Provider.of<FirestoreDatabase>(
+                                                  context,
+                                                  listen: false);
+                                          await firestoreDatabase.checkCode(
+                                              context,
+                                              widget.storeModel.id,
+                                              _codeController.text);
+                                        }
                                       } on PlatformException {
                                         code =
                                             'Failed to get platform version.';
@@ -152,12 +169,14 @@ class _StoreConfirmationScreenState extends State<StoreConfirmationScreen> {
                             : FlatButton(
                                 onPressed: () async {
                                   if (_codeController.text.isNotEmpty) {
+                                    print(
+                                        "this is sore id ${widget.storeModel.id}");
                                     final firestoreDatabase =
                                         Provider.of<FirestoreDatabase>(context,
                                             listen: false);
                                     await firestoreDatabase.checkCode(
                                         context,
-                                        widget.storeModel,
+                                        widget.storeModel.id,
                                         _codeController.text);
                                   }
                                 },

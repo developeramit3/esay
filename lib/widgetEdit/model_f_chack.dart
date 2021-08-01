@@ -107,7 +107,6 @@ class GetCodeEdit {
         FirebaseFirestore.instance.collection("codes").doc().set({
           "code": id,
           "user_id": authProvider.userModel.phoneNumber,
-          "open": false,
           "offerId": offerModel.id,
           "storeId": offerModel.store,
           "dateTime": DateTime.now(),
@@ -115,7 +114,6 @@ class GetCodeEdit {
               DateTime.now().add(Duration(hours: offerModel.timeCode)),
           "cost": "0.0",
           "close": false,
-          "tokenId": authProvider.userModel.tokenId
         }).then((_) {
 
           String endDate = DateTime.now()

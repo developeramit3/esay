@@ -128,13 +128,13 @@ class _AccountScreenState extends State<AccountScreen> {
                                   height: 10,
                                 ),
                                 Text(
-                                  "احصل على أحد رموز أيزي لتظهر هون",
+                                  "احصل على أحد رموز إيزي لتظهر هون",
                                   style: TextStyle(
                                       fontSize: 18,
                                       fontWeight: FontWeight.w700),
                                 ),
                                 Text(
-                                  "وتقدر توصل للرمز بدون أنترنت",
+                                  " وتقدر توصل للرمز بدون إنترنت",
                                   style: TextStyle(
                                       fontSize: 18,
                                       fontWeight: FontWeight.w700),
@@ -160,13 +160,13 @@ class _AccountScreenState extends State<AccountScreen> {
                                     height: 10,
                                   ),
                                   Text(
-                                    "احصل على أحد رموز أيزي لتظهر هون",
+                                    "احصل على أحد رموز إيزي لتظهر هون",
                                     style: TextStyle(
                                         fontSize: 18,
                                         fontWeight: FontWeight.w700),
                                   ),
                                   Text(
-                                    "وتقدر توصل للرمز بدون أنترنت",
+                                    "وتقدر توصل للرمز بدون إنترنت",
                                     style: TextStyle(
                                         fontSize: 18,
                                         fontWeight: FontWeight.w700),

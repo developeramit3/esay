@@ -83,7 +83,7 @@ class _AccountFimPhoneState extends State<AccountFimPhone> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          "اضافة فرد من العاىْلة",
+                          "إضافة فرد من العائلة",
                           style: TextStyle(
                               color: Colors.black,
                               fontSize: 22,

@@ -97,7 +97,7 @@ showQDialog(
                                 }
                               },
                               child: Text(
-                                'تحقاق',
+                                'تحقق',
                                 style: TextStyle(
                                     fontSize: 22, fontWeight: FontWeight.bold),
                               ),

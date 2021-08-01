@@ -215,7 +215,7 @@ class _StoreSharingScreenState extends State<StoreSharingScreen> {
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
                                 Text(
-                                  "12 أشهر",
+                                  "12 شهر",
                                   style: TextStyle(fontSize: 22),
                                 ),
                                 Text(
@@ -290,7 +290,7 @@ class _StoreSharingScreenState extends State<StoreSharingScreen> {
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
                               Text(
-                                "1 أشهر",
+                                "1 شهر",
                                 style: TextStyle(fontSize: 22),
                               ),
                               Text(

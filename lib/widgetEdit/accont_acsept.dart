@@ -38,7 +38,7 @@ class PrivacyPolicy extends StatelessWidget {
             height: 15,
           ),
           Text(
-            "بس لزم تكون موجودة",
+            "بس لازم تكون موجودة",
             style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
           ),
           Container(

@@ -81,7 +81,7 @@ class WelcomeScreen extends StatelessWidget {
             Column(
               children: [
                 Text(
-                  "عند الضغط على متابعة فانك توافق على",
+                  "عند الضغط على متابعة فإنك توافق على",
                   style: TextStyle(
                     color: HexColor("#49494a"),
                   ),
@@ -100,11 +100,18 @@ class WelcomeScreen extends StatelessWidget {
                                     )));
                       },
                       child: Text(
-                        "سياسة الخصوصية و ",
+                        "سياسة الخصوصية",
                         style: TextStyle(
                           color: HexColor("#49494a"),
                           decoration: TextDecoration.underline,
                         ),
+                      ),
+                    ),
+                    Text(
+                      "و",
+                      style: TextStyle(
+                        color: HexColor("#49494a"),
+
                       ),
                     ),
                     InkWell(
@@ -115,7 +122,7 @@ class WelcomeScreen extends StatelessWidget {
                                 builder: (context) => TermsOfUse()));
                       },
                       child: Text(
-                        " شروط الاستخدام",
+                        "شروط الاستخدام",
                         style: TextStyle(
                           color: HexColor("#49494a"),
                           decoration: TextDecoration.underline,

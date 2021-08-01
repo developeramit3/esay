@@ -195,14 +195,15 @@ class FirestoreDatabase {
   }
 
   Future<void> checkCode(
-      BuildContext context, StoreModel storeModel, String code) async {
+      BuildContext context, String storeModel, String code) async {
     final loadingProvider =
         Provider.of<LoadingProvider>(context, listen: false);
     final codeProvider = Provider.of<CodeProvider>(context, listen: false);
     loadingProvider.changeLoading(true);
+    print("$storeModel.i$storeModel");
     final documentReference = await _firebaseFirestore
         .collection("codes")
-        .where('storeId', isEqualTo: storeModel.id)
+        .where('storeId', isEqualTo: storeModel)
         .where('code', isEqualTo: code)
         .where('close', isEqualTo: false)
         .get();
@@ -980,7 +981,6 @@ class FirestoreDatabase {
       'easyCost': easyCost.toInt(),
       'endDateTime': endDate,
       'phoneNumber': phone,
-      'storeId': storeId,
       'storeName': nameStore,
     });
   }

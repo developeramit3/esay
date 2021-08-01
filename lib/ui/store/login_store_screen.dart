@@ -32,7 +32,7 @@ class _LoginStoreScreenState extends State<LoginStoreScreen> {
             Padding(
               padding: EdgeInsets.symmetric(vertical: 32, horizontal: 70),
               child: Text(
-                AppLocalizations.of(context).translate('loginStoreNote'),
+               "هذه الصفحة خاصة فقط بالمحلات المسجلة لدينا مسبقا، تواصلوا معنا لتصيرو جزء من عيلتنا!",
                 style: TextStyle(
                     fontSize: 17,
                     color: HexColor("#49494a"),

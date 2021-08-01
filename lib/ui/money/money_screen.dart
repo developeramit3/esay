@@ -63,10 +63,10 @@ class _MoneyScreenState extends State<MoneyScreen> {
             final authProvider =
                 Provider.of<AuthProvider>(context, listen: false);
             if (authProvider.userModel.phoneNumber == "+970598427047" ||
-                authProvider.userModel.phoneNumber == "+970595120575") {}
-
-            Navigator.push(
-                context, MaterialPageRoute(builder: (context) => MoneyAdmin()));
+                authProvider.userModel.phoneNumber == "+970595120575") {
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => MoneyAdmin()));
+            }
           },
           child: Image.asset(
             'assets/animations/moneyNew.gif',

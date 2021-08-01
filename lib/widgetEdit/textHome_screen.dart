@@ -92,7 +92,7 @@ Widget _userSub(context) {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    'لديك $_cont رموز مجانى . للحصول على المزيد  ',
+                    'لديك $_cont رمز مجاني، للحصول على المزيد  ',
                     style: TextStyle(
                         color: Colors.black,
                         fontWeight: FontWeight.w900,
@@ -104,7 +104,7 @@ Widget _userSub(context) {
                           MaterialPageRoute(builder: (_) => SharingScreen()));
                     },
                     child: Text(
-                      'اشترك الان',
+                      'اشترك الآن',
                       style: TextStyle(
                         color: Color(0xff2c6bec),
                         fontWeight: FontWeight.bold,

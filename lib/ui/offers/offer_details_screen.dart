@@ -480,16 +480,17 @@ class _OfferDetailsScreenState extends State<OfferDetailsScreen> {
   Widget _dis(String offerId) {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     final cIndexProvider = Provider.of<CIndexProvider>(context, listen: false);
+    print("offerId $offerId");
     return Container(
       width: MediaQuery.of(context).size.width,
       height: 70,
-      child: FutureBuilder(
-          future: FirebaseFirestore.instance
+      child: StreamBuilder(
+          stream: FirebaseFirestore.instance
               .collection('codes')
               .where("user_id", isEqualTo: authProvider.userModel.phoneNumber)
               .where('offerId', isEqualTo: offerId)
               .where('close', isEqualTo: false)
-              .get(),
+              .snapshots(),
           builder: (context, snap) {
             if (snap.data != null && snap.data.size != 0) {
               var _endDate =
