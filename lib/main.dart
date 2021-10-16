@@ -7,26 +7,34 @@ import 'package:esay/providers/rating_provider.dart';
 import 'package:esay/providers/share_provider.dart';
 import 'package:esay/providers/splash_provider.dart';
 import 'package:esay/providers/store_provider.dart';
-import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+import 'package:firebase_core/firebase_core.dart';
+// import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'my_app.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'providers/auth_provider.dart';
 import 'providers/favorite_provider.dart';
 import 'providers/language_provider.dart';
 import 'services/firestore_database.dart';
 
+void _enablePlatformOverrideForDesktop() {
+  if (!kIsWeb && (Platform.isWindows || Platform.isLinux)) {
+    debugDefaultTargetPlatformOverride = TargetPlatform.fuchsia;
+  }
+}
+
 void main() async {
   if (!kIsWeb && Platform.isMacOS) {
     debugDefaultTargetPlatformOverride = TargetPlatform.fuchsia;
   }
+
   WidgetsBinding.instance;
   WidgetsFlutterBinding.ensureInitialized();
+  _enablePlatformOverrideForDesktop();
   await Firebase.initializeApp();
- // FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterError;
+   // FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterError;
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp])
       .then((_) async {
     runApp(

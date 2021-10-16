@@ -1,6 +1,8 @@
 class StoreModel {
   final String id;
+  final String icon;
   final String logo;
+  final bool mun;
   final String name;
   final String password;
   final String phone;
@@ -17,8 +19,10 @@ class StoreModel {
   StoreModel(
       {this.id,
       this.logo,
+      this.mun,
       this.name,
       this.password,
+        this.icon,
       this.phone,
       this.category,
       this.menu,
@@ -36,7 +40,9 @@ class StoreModel {
       return null;
     }
     String id = documentId;
+    String icon = data['icon'];
     String logo = data['logo'];
+    bool mun = data['name_menu'];
     String name = data['name'];
     String password = data['password'];
     String phone = data['phone'];
@@ -53,7 +59,9 @@ class StoreModel {
 
     return StoreModel(
         id: id,
+        icon: icon,
         logo: logo,
+        mun: mun,
         name: name,
         password: password,
         phone: phone,

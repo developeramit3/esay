@@ -8,7 +8,7 @@ import 'package:path_provider/path_provider.dart';
 Future<void> openFile(BuildContext context, String url, String fileName) async {
   String dir = (await getApplicationDocumentsDirectory()).path;
   File file = new File('$dir/$fileName');
-  var request = await http.get(url);
+  var request = await http.get(Uri.parse(url));
   await file.writeAsBytes(request.bodyBytes);
   await OpenFile.open(file.path);
 }

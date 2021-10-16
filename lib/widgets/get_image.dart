@@ -1,4 +1,3 @@
-import 'package:advance_pdf_viewer/advance_pdf_viewer.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:esay/functions/favorite.dart';
 import 'package:esay/functions/open_file.dart';
@@ -14,76 +13,69 @@ import '../providers/favorite_provider.dart';
 
 /*==================================ImageOffer===============================*/
 
-Widget getImageOffer(
-    String imageName, double height, double width, String offerId) {
-  return FutureBuilder<String>(
-      future: _getImageOffers(imageName),
-      builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
-        switch (snapshot.connectionState) {
-          case ConnectionState.waiting:
-            return Container(
-                decoration: BoxDecoration(color: Colors.white),
-                alignment: Alignment.center,
-                height: height,
-                child: Container(
-                    width: width,
-                    height: height,
-                    child: ClipRRect(
-                        borderRadius: BorderRadius.circular(20.0),
-                        child: Image.asset(
-                          'assets/images/offer1.png',
-                        ))));
-          default:
-            return Stack(
-              children: <Widget>[
-                Container(
-                    decoration: BoxDecoration(color: Colors.white),
-                    alignment: Alignment.center,
-                    height: height,
-                    child: Container(
-                        width: width,
-                        height: height,
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(20.0),
-                          child: CachedNetworkImage(
-                            imageUrl: snapshot.data,
-                            fit: BoxFit.fill,
-                            placeholder: (context, url) =>
-                                Image.asset('assets/images/offer1.png'),
-                            errorWidget: (context, url, error) =>
-                                Icon(Icons.error),
-                          ),
-                        ))),
-                Consumer<FavoriteProvider>(
-                    builder: (context, favoriteProvider, _) {
-                  return !favoriteProvider.getFavoriteId.contains(offerId)
-                      ? InkWell(
-                          onTap: () {
+// Widget getImageOffer(
+//     String imageName, double height, double width, String offerId) {
+// }
+class GetImageOffer extends StatelessWidget {
+  final String imageName;
+  final double height;
+  final double width;
+  final String offerId;
+  const GetImageOffer(
+      {Key key, this.imageName, this.height, this.width, this.offerId})
+      : super(key: key);
 
-                            favoriteLike(context, offerId);
-                            },
-                          child: Padding(
-                              padding: const EdgeInsets.only(left: 12, top: 12),
-                              child: Align(
-                                  alignment: Alignment.bottomLeft,
-                                  child: Icon(Icons.favorite_border,
-                                      size: 30, color: Colors.red))))
-                      : InkWell(
-                          onTap: () async {
-                            favoriteUnLike(context, offerId);
-                          },
-                          child: Padding(
-                              padding: const EdgeInsets.only(left: 12, top: 12),
-                              child: Align(
-                                  alignment: Alignment.bottomLeft,
-                                  child: Icon(Icons.favorite,
-                                      size: 30, color: Colors.red))));
-                }),
-                SizedBox(width: 50),
-              ],
-            );
-        }
-      });
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      children: <Widget>[
+        Container(
+          decoration: BoxDecoration(color: Colors.white),
+          alignment: Alignment.center,
+          height: height,
+          child: Container(
+            width: width,
+            height: height,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(20.0),
+              child: CachedNetworkImage(
+                imageUrl:
+                    "$imageName",
+                fit: BoxFit.fill,
+                placeholder: (context, url) =>
+                    Image.asset('assets/images/offer1.png'),
+                errorWidget: (context, url, error) => Icon(Icons.error),
+              ),
+            ),
+          ),
+        ),
+        Consumer<FavoriteProvider>(builder: (context, favoriteProvider, _) {
+          return !favoriteProvider.getFavoriteId.contains(offerId)
+              ? InkWell(
+                  onTap: () {
+                    favoriteLike(context, offerId);
+                  },
+                  child: Padding(
+                      padding: const EdgeInsets.only(left: 12, top: 12),
+                      child: Align(
+                          alignment: Alignment.bottomLeft,
+                          child: Icon(Icons.favorite_border,
+                              size: 30, color: Colors.red))))
+              : InkWell(
+                  onTap: () async {
+                    favoriteUnLike(context, offerId);
+                  },
+                  child: Padding(
+                      padding: const EdgeInsets.only(left: 12, top: 12),
+                      child: Align(
+                          alignment: Alignment.bottomLeft,
+                          child: Icon(Icons.favorite,
+                              size: 30, color: Colors.red))));
+        }),
+        SizedBox(width: 50),
+      ],
+    );
+  }
 }
 
 Widget getImageOfferDetail(
@@ -104,7 +96,7 @@ Widget getImageOfferDetail(
           default:
             return FadeInImage.assetNetwork(
               placeholder: 'assets/images/offer1.png',
-              image: snapshot.data,
+              image: "${snapshot.data}",
               height: height,
               width: width,
               fit: BoxFit.cover,
@@ -113,7 +105,7 @@ Widget getImageOfferDetail(
       });
 }
 
-getImageOffersForShare(BuildContext context, String filePath) async {
+getImageOffersForShare(BuildContext context, String filePath , image) async {
   final sharePovider = Provider.of<SharePovider>(context, listen: false);
   var _urlImage = await FirebaseStorage.instance
       .ref()
@@ -133,6 +125,8 @@ Future<String> _getImageOffers(String filePath) async {
 }
 
 Future<String> _getImageOffersDetail(String storeId, String filePath) async {
+  print(storeId);
+  print(filePath);
   var _urlImage = await FirebaseStorage.instance
       .ref()
       .child('stores')
@@ -150,8 +144,10 @@ Future<void> openPdfStore(
       .child(storeId)
       .child(filePath)
       .getDownloadURL();
-  PDFDocument doc = await PDFDocument.fromURL(urlImage);
-  Route route = MaterialPageRoute(builder: (context)=>PdfReadFile(document: doc,));
+  Route route = MaterialPageRoute(
+      builder: (context) => PdfReadFile(
+            document: urlImage,
+          ));
   Navigator.push(context, route);
   // await openFile(context, urlImage, filePath);
 }
@@ -170,10 +166,10 @@ Widget getImageOfferCategory(
             return Container(
                 decoration: BoxDecoration(color: Colors.white),
                 alignment: Alignment.center,
-                height: height,
+                height: 120,
                 child: Container(
-                    width: width,
-                    height: height,
+                    width: 180,
+                    height: 170,
                     child: ClipRRect(
                         borderRadius: BorderRadius.circular(20.0),
                         child: Image.asset(
@@ -184,9 +180,9 @@ Widget getImageOfferCategory(
               Container(
                   decoration: BoxDecoration(color: Colors.white),
                   alignment: Alignment.center,
-                  height: height,
+                  height: 120,
                   child: Container(
-                      width: width,
+                      width: 180,
                       height: height,
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(20.0),
@@ -225,13 +221,13 @@ Widget getImageOfferCategory(
                                             color: Colors.white,
                                           ),
                                         ),
-                                        Text(
-                                          offersCategoryModel.name,
-                                          style: TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 25,
-                                              fontWeight: FontWeight.bold),
-                                        )
+                                        // Text(
+                                        //   offersCategoryModel.name,
+                                        //   style: TextStyle(
+                                        //       color: Colors.white,
+                                        //       fontSize: 25,
+                                        //       fontWeight: FontWeight.bold),
+                                        // )
                                       ]),
                                 )));
                     }
@@ -242,7 +238,7 @@ Widget getImageOfferCategory(
 }
 
 Future<String> _getImageOfferCategoryPhoto(String id, String filePath) async {
- print("id $filePath");
+  print("id $filePath");
   var _urlImage = await FirebaseStorage.instance
       .ref()
       .child('offersCategory')

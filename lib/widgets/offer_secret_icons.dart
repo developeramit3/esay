@@ -2,34 +2,16 @@ import 'package:flutter/material.dart';
 
 Widget offerSecretIcons() {
   return Column(
+    mainAxisAlignment: MainAxisAlignment.center,
     children: [
       Image.asset(
-        "assets/images/secret1.png",
+        "assets/images/secret4.png",
         width: 15,
       ),
       Icon(
         Icons.fiber_manual_record,
         size: 15,
         color: Colors.blue[700],
-      ),
-      Icon(
-        Icons.fiber_manual_record,
-        color: Colors.blue[700],
-        size: 15,
-      ),
-      Icon(
-        Icons.fiber_manual_record,
-        color: Colors.blue[700],
-        size: 15,
-      ),
-      Image.asset(
-        "assets/images/secret2.png",
-        width: 15,
-      ),
-      Icon(
-        Icons.fiber_manual_record,
-        color: Colors.blue[700],
-        size: 15,
       ),
       Icon(
         Icons.fiber_manual_record,
@@ -60,25 +42,44 @@ Widget offerSecretIcons() {
         color: Colors.blue[700],
         size: 15,
       ),
-      // Image.asset(
-      //   "assets/images/secret4.png",
-      //   width: 15,
-      // ),
-      // Icon(
-      //   Icons.fiber_manual_record,
-      //   color: Colors.blue[700],
-      //   size: 15,
-      // ),
-      // Icon(
-      //   Icons.fiber_manual_record,
-      //   color: Colors.blue[700],
-      //   size: 15,
-      // ),
-      // Icon(
-      //   Icons.fiber_manual_record,
-      //   color: Colors.blue[700],
-      //   size: 15,
-      // ),
+      Image.asset(
+        "assets/images/hand emoji.png",
+        width: 15,
+      ),
+      Icon(
+        Icons.fiber_manual_record,
+        color: Colors.blue[700],
+        size: 15,
+      ),
+      Icon(
+        Icons.fiber_manual_record,
+        color: Colors.blue[700],
+        size: 15,
+      ),
+      Icon(
+        Icons.fiber_manual_record,
+        color: Colors.blue[700],
+        size: 15,
+      ),
+      Image.asset(
+        "assets/images/secret1.png",
+        width: 15,
+      ),
+      Icon(
+        Icons.fiber_manual_record,
+        color: Colors.blue[700],
+        size: 15,
+      ),
+      Icon(
+        Icons.fiber_manual_record,
+        color: Colors.blue[700],
+        size: 15,
+      ),
+      Icon(
+        Icons.fiber_manual_record,
+        color: Colors.blue[700],
+        size: 15,
+      ),
     ],
   );
 }

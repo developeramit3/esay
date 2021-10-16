@@ -73,7 +73,7 @@ class WelcomeScreen extends StatelessWidget {
             Text(
               AppLocalizations.of(context).translate('offerTextWelcome'),
               style: TextStyle(
-                  fontSize: 16, color: HexColor('#49494a'), wordSpacing: -1),
+                  fontSize: 16, color: HexColor('#49494a'), wordSpacing: 2),
             ),
             SizedBox(
               height: 35,
@@ -108,7 +108,7 @@ class WelcomeScreen extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      "و",
+                      " و",
                       style: TextStyle(
                         color: HexColor("#49494a"),
 

@@ -1,12 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:esay/my_app.dart';
 import 'package:esay/providers/bottom_animation_provider.dart';
 import 'package:esay/providers/splash_provider.dart';
 import 'package:esay/widgetEdit/test.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter_restart/flutter_restart.dart';
 import 'package:provider/provider.dart';
 
 import '../app_localizations.dart';
@@ -31,7 +29,7 @@ class AuthProvider extends ChangeNotifier {
   Stream<UserModel> get user => _auth.authStateChanges().map(_userFromFirebase);
   String verificationId, smsCode;
   int forceResendingToken;
-  final FirebaseMessaging firebaseMessaging = FirebaseMessaging();
+  final FirebaseMessaging firebaseMessaging = FirebaseMessaging.instance;
 
   AuthProvider() {
     _auth = FirebaseAuth.instance;
@@ -116,6 +114,7 @@ class AuthProvider extends ChangeNotifier {
       final PhoneVerificationCompleted verificationCompleted =
           (AuthCredential authCredential) async {
         await signInWithCredential(authCredential, context);
+
         final newRouteName = "/homeScreen";
         bool isNewRouteSameAsCurrent = false;
         Navigator.popUntil(context, (route) {

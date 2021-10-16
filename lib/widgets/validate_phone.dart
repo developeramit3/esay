@@ -4,8 +4,17 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../app_localizations.dart';
 
-validatePhone(BuildContext context, String codeDs ,  String code, String phone, String storeId,
-    int days, double calc, String easyCost, var scaffoldKey, String storeName) {
+validatePhone(
+    BuildContext context,
+    String codeDs,
+    String code,
+    String phone,
+    String storeId,
+    int days,
+    double calc,
+    String easyCost,
+    var scaffoldKey,
+    String storeName) {
   return showDialog(
     context: context,
     builder: (context) {
@@ -38,8 +47,8 @@ validatePhone(BuildContext context, String codeDs ,  String code, String phone, 
                 Navigator.pop(context);
                 final firestoreDatabase =
                     Provider.of<FirestoreDatabase>(context, listen: false);
-                await firestoreDatabase.checkUser(context,codeDs , code, phone, storeId,
-                    days, calc, easyCost, storeName, scaffoldKey);
+                await firestoreDatabase.checkUser(context, codeDs, code, phone,
+                    storeId, days, calc, easyCost, storeName, scaffoldKey);
               }),
         ],
       );

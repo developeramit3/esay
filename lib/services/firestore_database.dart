@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'dart:io';
- import 'package:esay/widgetEdit/test.dart';
+import 'package:esay/widgetEdit/offerSc.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:esay/caches/sharedpref/shared_preference_helper.dart';
 import 'package:esay/functions/save_code.dart';
@@ -17,18 +17,15 @@ import 'package:esay/ui/offers/offer_details_screen.dart';
 import 'package:esay/ui/store/store_home.dart';
 import 'package:esay/widgets/code_offer.dart';
 import 'package:esay/widgets/show_toast.dart';
-import 'package:esay/widgets/sucess_sharing.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
-import 'package:hexcolor/hexcolor.dart';
 import 'package:meta/meta.dart';
 import 'package:provider/provider.dart';
 import 'package:random_string/random_string.dart';
 import '../models/user_model.dart';
 import 'firestore_path.dart';
 import 'firestore_service.dart';
-
+import 'package:esay/ui/store/loginstore.dart';
 String documentIdFromCurrentDate() => DateTime.now().toIso8601String();
 
 class FirestoreDatabase {
@@ -86,6 +83,9 @@ class FirestoreDatabase {
   }
 
   Future<void> loginStore(BuildContext context, StoreModel storeModel) async {
+    final cIndexProvider =
+    Provider.of<CIndexProvider>(context,
+        listen: false);
     final loadingProvider =
         Provider.of<LoadingProvider>(context, listen: false);
     final storePovider = Provider.of<StorePovider>(context, listen: false);
@@ -100,11 +100,23 @@ class FirestoreDatabase {
           StoreModel.fromMap(documentReference.data(), documentReference.id);
       if (storeModel.name == _storeModel.name) {
         storePovider.changeEasyCost(double.parse(_storeModel.easyCost));
-        SharedPreferenceHelper().setStorePrefs(storeModel.password);
-        Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (_) => StoreHome(storeModel: storeModel)));
+       await SharedPreferenceHelper().setStorePrefs(storeModel.password);
+        cIndexProvider.changeCIndex(0);
+        cIndexProvider.changeNameNav("home");
+        final newRouteName = "/homeScreen";
+        bool isNewRouteSameAsCurrent = false;
+        Navigator.popUntil(context, (route) {
+          if (route.settings.name == newRouteName) {
+            isNewRouteSameAsCurrent = true;
+          }
+          return true;
+        });
+
+        if (!isNewRouteSameAsCurrent) {
+
+          Navigator.pushNamed(context, newRouteName);
+        }
+
       } else {
         showToast("This account is not exist", Colors.red, context);
       }
@@ -141,8 +153,8 @@ class FirestoreDatabase {
         Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (_) => OfferDetailsScreen(
-                  offerModel: offerModel, storeModel: storeModel),
+              builder: (_) =>
+                  OfferSc(offerModel: offerModel, storeModel: storeModel),
             ));
       }
     }
@@ -152,13 +164,18 @@ class FirestoreDatabase {
       BuildContext context, OfferModel offerModel) async {
     final documentReference1 = await _firebaseFirestore
         .collection(FirestorePath.stores())
-        .doc(offerModel.store)
+        .doc(offerModel.store.toString())
         .get();
+    print('offerModel ${documentReference1.exists}');
     if (documentReference1.exists) {
+      print('offerModel.store ${offerModel.store}');
+      print('offerModel.store ${FirestorePath.storeDetails(offerModel.id)}');
+
       final documentReference2 = await _firebaseFirestore
           .collection(FirestorePath.storeDetails(offerModel.id))
           .doc(offerModel.store)
           .get();
+      print('offerModel ${documentReference2.exists}');
       if (documentReference2.exists) {
         print(documentReference2.id);
         OfferStoreModel offerStoreModel = OfferStoreModel.fromMap(
@@ -166,7 +183,7 @@ class FirestoreDatabase {
         StoreModel storeModel = StoreModel.fromMap(
             documentReference1.data(), documentReference1.id,
             offerStoreModelData: offerStoreModel);
-       // SetNot.getCodeDetail(context, offerModel);
+        // SetNot.getCodeDetail(context, offerModel);
         Navigator.push(
             context,
             MaterialPageRoute(
@@ -224,18 +241,21 @@ class FirestoreDatabase {
   }
 
   Future<void> checkRate(BuildContext context) async {
+    print("thissssssssssssss");
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     final ratingProvider = Provider.of<RatingProvider>(context, listen: false);
-
     if (authProvider.userModel.phoneNumber != "") {
       final documentReference = await _firebaseFirestore
           .collection(FirestorePath.getCodes())
-          .where('userId', isEqualTo: authProvider.userModel.phoneNumber)
+          .where('user_id', isEqualTo: authProvider.userModel.phoneNumber)
           .where('close', isEqualTo: true)
           .get();
-      if (documentReference.size == 1) {
+      if (documentReference.size >= 1) {
+        print("thissssssssssssss");
         SharedPreferenceHelper().getRate().then((value) {
+          print("thissssssssssssss$value");
           if (value == false) {
+            print("thissssssssssssss");
             ratingProvider.changeShow(true);
           }
         });
@@ -289,13 +309,9 @@ class FirestoreDatabase {
         Navigator.pushNamed(context, newRouteName);
       }
     } else {
-      showProgressDialog(
-          context: context,
-          loadingText: "",
-          backgroundColor: HexColor('#2c6bec'));
       try {
-        final response = await InternetAddress.lookup('www.kindacode.com');
-        if (response.isNotEmpty) {
+      //  final response = await InternetAddress.lookup('www.kindacode.com');
+
           final documentReference1 = await _firebaseFirestore
               .collection(FirestorePath.getCodes())
               .get();
@@ -318,7 +334,7 @@ class FirestoreDatabase {
                 showToast("code4", Colors.red, context);
               }
             }).toList();
-          }
+
         }
       } on SocketException catch (err) {
         print(err);
@@ -343,6 +359,7 @@ class FirestoreDatabase {
         path: FirestorePath.setCodes(DateTime.now().toIso8601String()),
         data: {
           "userId": authProvider.userModel.phoneNumber,
+          'free': true,
           "offerId": offerModel.id,
           "code": generateCode,
           "storeId": offerModel.store,
@@ -351,7 +368,6 @@ class FirestoreDatabase {
               DateTime.now().add(Duration(hours: offerModel.timeCode)),
           "cost": "0.0",
           "close": false,
-          "tokenId": authProvider.userModel.tokenId
         },
       );
       String endDate =
@@ -360,7 +376,11 @@ class FirestoreDatabase {
       codeProvider.changeCode(generateCode);
       codeProvider.changeTimestamp(
           DateTime.now().add(Duration(hours: offerModel.timeCode)));
-      showCodeDialog(context, generateCode, offerModel.timeCode);
+      showDialog(
+          context: context,
+          builder: (context) {
+            return CodeGetShow(code: generateCode, time: offerModel.timeCode);
+          });
     } else {
       String code = DateTime.now().year.toString() +
           DateTime.now().month.toString() +
@@ -387,14 +407,18 @@ class FirestoreDatabase {
       codeProvider.changeCode(code);
       codeProvider.changeTimestamp(
           DateTime.now().add(Duration(hours: offerModel.timeCode)));
-      showCodeDialog(context, code, offerModel.timeCode);
+      showDialog(
+          context: context,
+          builder: (context) {
+            return CodeGetShow(code: code, time: offerModel.timeCode);
+          });
     }
   }
 
   Future<void> updateNumCodes(String offerId) async {
     final _batchUpdate = FirebaseFirestore.instance.batch();
     final documentReference =
-        _firebaseFirestore.collection(FirestorePath.offers()).doc(offerId);
+        _firebaseFirestore.collection('offer_secret').doc(offerId);
     _batchUpdate.update(documentReference, {
       'numCodesTaken': FieldValue.increment(1),
     });
@@ -453,6 +477,18 @@ class FirestoreDatabase {
           double cos = value['profit'] + long2;
           checkus.update({
             'profit': cos,
+          }).then((_) {
+            print("value['family_phone']${value['family_phone']}");
+            if (value['family_phone'] != null) {
+              FirebaseFirestore.instance
+                  .collection('users')
+                  .doc(value['family_phone'])
+                  .update({
+                'profit': cos,
+              });
+            } else {
+              print("any ");
+            }
           });
         });
       });
@@ -507,7 +543,6 @@ class FirestoreDatabase {
     final codeProvider = Provider.of<CodeProvider>(context, listen: false);
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     codeProvider.changeCost(0.0);
-
     if (authProvider.userModel.phoneNumber != "") {
       final documentReference = await _firebaseFirestore
           .collection(FirestorePath.getCodes())
@@ -551,6 +586,10 @@ class FirestoreDatabase {
       String easyCost,
       String storeName,
       var scaffoldKey) async {
+    var _x;
+    var _y;
+    int _c;
+    var _s;
     print("111$days");
     final loadingProvider =
         Provider.of<LoadingProvider>(context, listen: false);
@@ -564,18 +603,50 @@ class FirestoreDatabase {
         .doc(phone)
         .get();
     if (codeDs.isNotEmpty) {
-      if (snapshot['codeEasy'] == codeDs) {
-        await setUserSharing(
-            context, code, phone, storeId, days, calc, storeName, scaffoldKey);
-        loadingProvider.changeLoading(false);
-      } else {
+      try {
+        if (snapshot['codeEasy'] != null && snapshot['codeEasy'] == codeDs) {
+          _x = ((75 / 100) * calc);
+          _y = calc - _x;
+          _c = _y.toInt();
+          _s = _x - 6;
+          print("total $_y ");
+          print("ssssss"
+              "ssssssssssssss$_x");
+          await setUserSharing(context, code, phone, storeId, days,
+                  _s.toDouble(), storeName, scaffoldKey)
+              .then((value) {
+            FirebaseFirestore.instance
+                .collection(FirestorePath.checkUser())
+                .doc(phone)
+                .update({
+              'profit': FieldValue.increment(_c),
+            });
+          });
+          loadingProvider.changeLoading(false);
+        } else {
+          shoCodeD(context);
+          loadingProvider.changeLoading(false);
+        }
+      } catch (e) {
         shoCodeD(context);
+        loadingProvider.changeLoading(false);
       }
     } else {
       if (querySnapshot.exists) {
+        double _cotcRem() {
+          if (days == 360) {
+            return calc - 6.0;
+          } else {
+            return calc;
+          }
+        }
+
         print("ok");
-        await setUserSharing(
-            context, code, phone, storeId, days, calc, storeName, scaffoldKey);
+        await setUserSharing(context, code, phone, storeId, days, _cotcRem(),
+                storeName, scaffoldKey)
+            .then((value) {
+          loadingProvider.changeLoading(false);
+        });
         // } else {
         //   DateTime endDateTime = querySnapshot.docs[0]
         //       .data()['endDateTime']
@@ -584,7 +655,6 @@ class FirestoreDatabase {
         //   await udateUserSharing(context, querySnapshot.docs[0].id, endDateTime);
         // }+970598427047
         // await updateEasyCostStore(storeId, easyCost);
-        loadingProvider.changeLoading(false);
       } else {
         loadingProvider.changeLoading(false);
         showToast(
@@ -615,8 +685,6 @@ class FirestoreDatabase {
       double calc,
       String storeName,
       var scaffoldKey) async {
-    final querySnapshotSub =
-        await FirebaseFirestore.instance.collection('subscription').doc().get();
     await FirebaseFirestore.instance
         .collection(FirestorePath.checkUser())
         .doc(phone)
@@ -631,17 +699,18 @@ class FirestoreDatabase {
               .then((value) async {
             print(" days $days");
             if (days == 360) {
-              final qouer = await Firestore.instance
+              final qouer = await FirebaseFirestore.instance
                   .collection('sharing_users')
                   .where('phoneNumber', isEqualTo: phone)
                   .get();
-              if (qouer.size == 0) {
+              if (qouer.size != null) {
                 await FirebaseFirestore.instance
                     .collection("users")
                     .doc(phone)
                     .update({
                   'codeEasy': "",
                   'notifications_check': true,
+                  'free_code': 0,
                   'notf': "",
                   "subscription12m": true,
                   "subscription6m": false,
@@ -651,13 +720,26 @@ class FirestoreDatabase {
                     phone: phone,
                     close: false,
                     easyCost: calc,
-                    endDate: DateTime.now().add(Duration(days: days)),
+                    endDate: DateTime.now().add(Duration(days: 366)),
                     nameStore: storeName,
                     storeId: storeId,
                     time: DateTime.now(),
                   );
+                }).then((value) {
+                  updateEasyCostStore(storeId, calc.toString());
                 });
-                sucessSharing(context, calc.toStringAsFixed(1), scaffoldKey);
+                double _chechCalc() {
+                  if (days == 360) {
+                    return calc + 6.0;
+                  } else if (days == 180) {
+                    return calc + 3.0;
+                  } else if (days == 30) {
+                    return calc + 2.0;
+                  }
+                  return null;
+                }
+
+                sucessSharing(context, _chechCalc().toString(), scaffoldKey);
               } else {
                 print("else");
                 await FirebaseFirestore.instance
@@ -674,7 +756,10 @@ class FirestoreDatabase {
                     'codeEasy': "",
                     'notifications_check': true,
                     'notf': "",
+                    'free_code': 0,
                     "subscription12m": true,
+                    'subscription1': false,
+                    'subscription6m': false,
                   }).then((value) async {
                     FirebaseFirestore.instance
                         .collection("codes")
@@ -697,9 +782,6 @@ class FirestoreDatabase {
                         .doc(phone)
                         .get()
                         .then((valueSharing) async {
-                      print("easyCosts${valueSharing['easyCost']}");
-                      print(
-                          "subscription ${valueSharing['Subscription_counter']}");
                       double easyCost1 = valueSharing['easyCost'] + calc;
                       int subscription =
                           valueSharing['Subscription_counter'] + 1;
@@ -710,7 +792,7 @@ class FirestoreDatabase {
                           .doc(phone)
                           .update({
                         'dateTime': DateTime.now(),
-                        'endDateTime': DateTime.now().add(Duration(days: days)),
+                        'endDateTime': DateTime.now().add(Duration(days: 366)),
                         'Subscription_counter': subscription,
                         'easyCost': easyCost1,
                         'storeId': storeId,
@@ -718,11 +800,25 @@ class FirestoreDatabase {
                       });
                     });
                   });
+                }).then((value) {
+                  updateEasyCostStore(storeId, calc.toString());
                 });
-                sucessSharing(context, calc.toStringAsFixed(1), scaffoldKey);
+                double _chechCalc() {
+                  if (days == 360) {
+                    return calc + 6.0;
+                  } else if (days == 180) {
+                    return calc + 3.0;
+                  } else if (days == 30) {
+                    return calc + 2.0;
+                  }
+                  return null;
+                }
+
+                print("this is 12 m =>$_chechCalc()");
+                sucessSharing(context, _chechCalc().toString(), scaffoldKey);
               }
             } else if (days == 180) {
-              final qouer = await Firestore.instance
+              final qouer = await FirebaseFirestore.instance
                   .collection('sharing_users')
                   .where('phoneNumber', isEqualTo: phone)
                   .get();
@@ -734,6 +830,7 @@ class FirestoreDatabase {
                   'codeEasy': "",
                   'notifications_check': true,
                   'notf': "",
+                  'free_code': 0,
                   "subscription12m": false,
                   "subscription6m": true,
                   "subscription1": false,
@@ -757,13 +854,26 @@ class FirestoreDatabase {
                     phone: phone,
                     close: false,
                     easyCost: calc,
-                    endDate: DateTime.now().add(Duration(days: days)),
+                    endDate: DateTime.now().add(Duration(days: 183)),
                     nameStore: storeName,
                     storeId: storeId,
                     time: DateTime.now(),
                   );
+                }).then((_) async {
+                  updateEasyCostStore(storeId, calc.toString());
+                  double _chechCalc() {
+                    if (days == 360) {
+                      return calc + 6.0;
+                    } else if (days == 180) {
+                      return calc + 3.0;
+                    } else if (days == 30) {
+                      return calc + 2.0;
+                    }
+                    return null;
+                  }
+
+                  sucessSharing(context, _chechCalc().toString(), scaffoldKey);
                 });
-                sucessSharing(context, calc.toStringAsFixed(1), scaffoldKey);
               } else {
                 print("else");
                 await FirebaseFirestore.instance
@@ -779,7 +889,10 @@ class FirestoreDatabase {
                     'codeEasy': "",
                     'notifications_check': true,
                     'notf': "",
+                    'free_code': 0,
                     "subscription6m": true,
+                    'subscription12m': false,
+                    'subscription1': false,
                   }).then((value) async {
                     FirebaseFirestore.instance
                         .collection("codes")
@@ -815,7 +928,7 @@ class FirestoreDatabase {
                           .doc(phone)
                           .update({
                         'dateTime': DateTime.now(),
-                        'endDateTime': DateTime.now().add(Duration(days: days)),
+                        'endDateTime': DateTime.now().add(Duration(days: 183)),
                         'Subscription_counter': subscription,
                         'easyCost': easyCost1,
                         'storeId': storeId,
@@ -823,11 +936,24 @@ class FirestoreDatabase {
                       });
                     });
                   });
+                }).then((_) async {
+                  updateEasyCostStore(storeId, calc.toString());
+                  double _chechCalc() {
+                    if (days == 360) {
+                      return calc + 6.0;
+                    } else if (days == 180) {
+                      return calc + 3.0;
+                    } else if (days == 30) {
+                      return calc + 2.0;
+                    }
+                    return null;
+                  }
+
+                  sucessSharing(context, _chechCalc().toString(), scaffoldKey);
                 });
-                sucessSharing(context, calc.toStringAsFixed(1), scaffoldKey);
               }
             } else if (days == 30) {
-              final qouer = await Firestore.instance
+              final qouer = await FirebaseFirestore.instance
                   .collection('sharing_users')
                   .where('phoneNumber', isEqualTo: phone)
                   .get();
@@ -836,6 +962,10 @@ class FirestoreDatabase {
                     .collection("users")
                     .doc(phone)
                     .update({
+                  'codeEasy': "",
+                  'notifications_check': true,
+                  'notf': "",
+                  'free_code': 0,
                   "subscription12m": false,
                   "subscription6m": false,
                   "subscription1": true,
@@ -859,13 +989,26 @@ class FirestoreDatabase {
                     phone: phone,
                     close: false,
                     easyCost: calc,
-                    endDate: DateTime.now().add(Duration(days: days)),
+                    endDate: DateTime.now().add(Duration(days: 31)),
                     nameStore: storeName,
                     storeId: storeId,
                     time: DateTime.now(),
                   );
+                }).then((value) async {
+                  updateEasyCostStore(storeId, calc.toString());
+                  double _chechCalc() {
+                    if (days == 360) {
+                      return calc + 6.0;
+                    } else if (days == 180) {
+                      return calc + 3.0;
+                    } else if (days == 30) {
+                      return calc + 2.0;
+                    }
+                    return null;
+                  }
+
+                  sucessSharing(context, _chechCalc().toString(), scaffoldKey);
                 });
-                sucessSharing(context, calc.toStringAsFixed(1), scaffoldKey);
               } else {
                 print("else");
                 await FirebaseFirestore.instance
@@ -874,15 +1017,18 @@ class FirestoreDatabase {
                     .get()
                     .then((valueUser1) {
                   print('else2');
-                  int add = value['subscription_1'] + 1;
-                  print(add);
                   FirebaseFirestore.instance
                       .collection('users')
                       .doc(phone)
                       .update({
-                    "subscription1": true,
+                    'codeEasy': "",
+                    'notifications_check': true,
+                    'notf': "",
+                    'free_code': 0,
+                    "subscription6m": false,
+                    'subscription12m': false,
+                    'subscription1': true,
                   }).then((value) async {
-                    print('part 2');
                     FirebaseFirestore.instance
                         .collection("codes")
                         .where("user_id", isEqualTo: phone)
@@ -898,30 +1044,49 @@ class FirestoreDatabase {
                         });
                       });
                     });
+                    print('part 2');
                     await FirebaseFirestore.instance
                         .collection('sharing_users')
                         .doc(phone)
                         .get()
                         .then((valueSharing) async {
-                      int easyCosts = valueSharing['easyCost'] + calc.toInt();
+                      print("easyCosts${valueSharing['easyCost']}");
+                      print(
+                          "subscription ${valueSharing['Subscription_counter']}");
+                      double easyCost1 = valueSharing['easyCost'] + calc;
                       int subscription =
                           valueSharing['Subscription_counter'] + 1;
+                      // print("easyCosts${valueSharing['easyCost']}");
+                      //print("subscription ${valueSharing['Subscription_counter']}");
                       await FirebaseFirestore.instance
                           .collection('sharing_users')
                           .doc(phone)
                           .update({
                         'dateTime': DateTime.now(),
-                        'endDateTime': DateTime.now().add(Duration(days: days)),
+                        'endDateTime': DateTime.now().add(Duration(days: 31)),
                         'Subscription_counter': subscription,
-                        'easyCost': easyCosts,
+                        'easyCost': easyCost1,
                         'storeId': storeId,
-                        'storeName': storeName,
+                        'storeName': storeName, // 598427047
                       });
                     });
                   });
+                }).then((value) async {
+                  updateEasyCostStore(storeId, calc.toString());
+                  double _chechCalc() {
+                    if (days == 360) {
+                      return calc + 6.0;
+                    } else if (days == 180) {
+                      return calc + 3.0;
+                    } else if (days == 30) {
+                      return calc + 2.0;
+                    }
+                    return null;
+                  }
+
+                  sucessSharing(context, _chechCalc().toString(), scaffoldKey);
                 });
               }
-              sucessSharing(context, calc.toStringAsFixed(1), scaffoldKey);
             }
           });
         } catch (e) {
@@ -931,7 +1096,6 @@ class FirestoreDatabase {
       } else {
         // show error is user is not have acc
         print("you have error"); //598427047
-
         showToast("This user is already have account", Colors.red,
             scaffoldKey.currentContext,
             center: true);
@@ -940,13 +1104,17 @@ class FirestoreDatabase {
   }
 
   Future<void> updateEasyCostStore(String storeId, String easyCost) async {
-    final _batchUpdate = FirebaseFirestore.instance.batch();
-    final documentReference =
-        _firebaseFirestore.collection(FirestorePath.stores()).doc(storeId);
-    _batchUpdate.update(documentReference, {
-      "easyCost": easyCost,
+    var e = double.tryParse(easyCost);
+    await FirebaseFirestore.instance
+        .collection('stores')
+        .doc(storeId)
+        .get()
+        .then((value) {
+      var _x = double.tryParse(value['easyCost']) + e;
+      FirebaseFirestore.instance.collection('stores').doc(storeId).update({
+        'easyCost': _x.toString(),
+      });
     });
-    await _batchUpdate.commit();
   }
 
   /*=============================Account==========================================*/
@@ -976,6 +1144,7 @@ class FirestoreDatabase {
         .collection(FirestorePath.checkSharingUsers())
         .doc(phone)
         .set({
+      'Subscription_counter': 1,
       'close': close,
       'dateTime': time,
       'easyCost': easyCost.toInt(),

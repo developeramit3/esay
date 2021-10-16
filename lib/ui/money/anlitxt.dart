@@ -2,7 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class AnlTs extends StatefulWidget {
-  const AnlTs({Key key}) : super(key: key);
+  final String number;
+  final String profit;
+  final String customer;
+  final String total;
+  const AnlTs({Key key, this.total, this.number, this.profit, this.customer})
+      : super(key: key);
 
   @override
   _AnlTsState createState() => _AnlTsState();
@@ -12,17 +17,96 @@ class _AnlTsState extends State<AnlTs> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
-      body: Padding(
-        padding: const EdgeInsets.all(20),
-        child: _drawProducts(),
+        appBar: AppBar(),
+        body: SingleChildScrollView(
+          child: Column(
+            children: [
+              SizedBox(
+                height: 50,
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  _getAniltes("ارباح الاشتراكات", widget.number),
+                  _getAniltes("ارباح المستخدمين", widget.profit)
+                ],
+              ),
+              SizedBox(
+                height: 20,
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  _getAniltes("ارباح المحلات", widget.total),
+                  _getAniltes("عدد العملاء", widget.customer)
+                ],
+              ),
+              SizedBox(
+                height: 20,
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  _drawProucts('1', 'subscription1'),
+                  _drawProucts('12', 'subscription12m'),
+                ],
+              ),
+              SizedBox(
+                height: 20,
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  _drawProucts('1', 'subscription1'),
+                  _drawProucts('6', 'subscription6m'),
+                ],
+              ),
+            ],
+          ),
+        ));
+  }
+
+  Widget _getAniltes(String text, String numb) {
+    return Container(
+      alignment: Alignment.center,
+      height: 170,
+      width: 170,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(10),
+        color: Colors.blue,
+      ),
+      child: Column(
+        children: [
+          SizedBox(
+            height: 30,
+          ),
+          Text(
+            text,
+            style: TextStyle(
+                color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold),
+          ),
+          SizedBox(
+            height: 10,
+          ),
+          Text(
+            numb,
+            style: TextStyle(
+                color: Colors.white,
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
+                letterSpacing: 1),
+          ),
+        ],
       ),
     );
   }
 
-  Widget _drawProducts() {
+  Widget _drawProucts(String month, String where) {
     return StreamBuilder<QuerySnapshot>(
-      stream: Firestore.instance.collection('sharing_users').snapshots(),
+      stream: FirebaseFirestore.instance
+          .collection('users')
+          .where(where, isEqualTo: true)
+          .snapshots(),
       builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
         if (snapshot.hasError) return new Text('Error: ${snapshot.error}');
         switch (snapshot.connectionState) {
@@ -31,43 +115,42 @@ class _AnlTsState extends State<AnlTs> {
               child: CircularProgressIndicator(),
             );
           default:
-            return ListView.builder(
-                physics: NeverScrollableScrollPhysics(),
-                shrinkWrap: true,
-                itemCount: snapshot.data.documents.length,
-                itemBuilder: (contextBuild, index) {
-                  return Column(
-                    children: [
-                      Container(
-                        height: 50,
-                        width: 300,
-                        decoration: BoxDecoration(
-                            border: Border.all(),
-                            borderRadius: BorderRadius.circular(10)),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Text(
-                              snapshot.data.docs[index]['easyCost'].toString(),
-                              style:
-                                  TextStyle(color: Colors.black, fontSize: 20),
-                            ),
-                            SizedBox(
-                              height: 30,
-                            ),
-                            Text(
-                              snapshot.data.docs[index]['phoneNumber']
-                                  .toString(),
-                              style:
-                                  TextStyle(color: Colors.black, fontSize: 20),
-                            )
-                          ],
-                        ),
-                      ),
-                    ],
-                  );
-                });
+            return Container(
+              alignment: Alignment.center,
+              height: 170,
+              width: 190,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+                color: Colors.blue,
+              ),
+              child: Column(
+                children: [
+                  SizedBox(
+                    height: 30,
+                  ),
+                  Text(
+                    ' عدد الاشتراك $month  شهر ',
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold),
+                  ),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  Text(
+                    snapshot.data.docs.length != null
+                        ? "${snapshot.data.docs.length}"
+                        : '0',
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 1),
+                  ),
+                ],
+              ),
+            );
         }
       },
     );

@@ -1,4 +1,5 @@
 import 'package:esay/functions/favorite.dart';
+import 'package:esay/providers/auth_provider.dart';
 import 'package:esay/services/firestore_database.dart';
 import 'package:esay/widgetEdit/test.dart';
 import 'package:esay/widgets/navbar.dart';
@@ -16,7 +17,6 @@ class HomeScreen extends StatefulWidget {
     Key key,
     this.title,
   }) : super(key: key);
-
   final String title;
 
   @override
@@ -26,22 +26,39 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   final _scaffoldKey = GlobalKey<ScaffoldState>();
   final LocalStorage storageCodes = LocalStorage('codes');
-
   @override
   void initState() {
+    checkuser();
     super.initState();
-    SetNot.getDataUsers(context);
+
     storageCodes.ready.then((value) {
       print(value);
     });
-    Future.delayed(Duration(seconds: 1), () async {
-      final firestoreDatabase =
-          Provider.of<FirestoreDatabase>(context, listen: false);
-      await firestoreDatabase.getStores(context);
-      await firestoreDatabase.checkRate(context);
-      await firestoreDatabase.checkUserSharing(context);
-    });
     getFavoritesId(context);
+  }
+
+  void checkuser() async {
+    await SetNot.setNot24(context);
+    await SetNot.getAllSizeUser(context);
+    await SetNot.delaetFamly(context);
+
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    if (authProvider.userModel.phoneNumber != '') {
+      print('authProvider${authProvider.userModel.phoneNumber}');
+      SetNot.getCodeDetail(context);
+      SetNot.getCodeFreeCode(context);
+      await SetNot.userNumberGetAuth(context);
+      await SetNot.getDataUsers(context);
+      await SetNot.timeUpd(context);
+      await SetNot.delatSub(context);
+      Future.delayed(Duration(seconds: 1), () async {
+        final firestoreDatabase =
+            Provider.of<FirestoreDatabase>(context, listen: false);
+        await firestoreDatabase.getStores(context);
+        await firestoreDatabase.checkRate(context);
+        await firestoreDatabase.checkUserSharing(context);
+      });
+    } else {}
   }
 
   Future<bool> _willPopScope() async {

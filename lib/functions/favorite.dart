@@ -33,5 +33,6 @@ void favoriteUnLike(BuildContext context, String offerId) async {
   favoriteProvider.removeFavoriteIdValue(offerId);
   SharedPreferenceHelper().removeFavoriteIdPrefs(offerId);
   await firestoreDatabase.updateFavoriteBtn(true, offerId);
+
 }
 /*================================favorite=====================================*/

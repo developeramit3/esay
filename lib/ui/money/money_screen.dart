@@ -4,31 +4,28 @@ import 'package:esay/providers/bottom_animation_provider.dart';
 import 'package:esay/providers/code_provider.dart';
 import 'package:esay/services/firestore_database.dart';
 import 'package:esay/widgets/navbar.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:provider/provider.dart';
 import '../../app_localizations.dart';
 import '../../widgets/appbar.dart';
 import 'monu_admin.dart';
-import 'package:esay/widgetEdit/test.dart';
-
+import 'package:esay/providers/account_provider.dart';
 class MoneyScreen extends StatefulWidget {
   @override
   _MoneyScreenState createState() => _MoneyScreenState();
 }
-
 class _MoneyScreenState extends State<MoneyScreen> {
   @override
   void initState() {
     super.initState();
-
     Future.delayed(Duration(seconds: 0), () async {
       final firestoreDatabase =
           Provider.of<FirestoreDatabase>(context, listen: false);
       await firestoreDatabase.calcCostUser(context);
     });
   }
-
   Future<bool> _willPopScope() async {
     Navigator.of(context).pop();
     final cIndexProvider = Provider.of<CIndexProvider>(context, listen: false);
@@ -36,7 +33,6 @@ class _MoneyScreenState extends State<MoneyScreen> {
     cIndexProvider.changeNameNav("home");
     return true;
   }
-
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
@@ -49,8 +45,8 @@ class _MoneyScreenState extends State<MoneyScreen> {
           ),
         ));
   }
-
   Widget _checkUse() {
+    print(' Provider.of<AccountProvider>(context,listen: false).prifc ${ Provider.of<AccountProvider>(context,listen: false).prifc}');
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -77,8 +73,7 @@ class _MoneyScreenState extends State<MoneyScreen> {
         SizedBox(height: 35),
         Column(
           children: [
-            Consumer<CodeProvider>(builder: (context, codeProvider, _) {
-              return codeProvider.getCost > 0.0
+            Provider.of<AccountProvider>(context,listen: false).prifc > 0
                   ? Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.end,
@@ -100,8 +95,7 @@ class _MoneyScreenState extends State<MoneyScreen> {
                             ),
                           ),
                         ])
-                  : Container();
-            }),
+                  : Container(),
             SizedBox(
               height: 15,
             ),
@@ -173,14 +167,16 @@ class _MoneyScreenState extends State<MoneyScreen> {
       ],
     );
   }
-
   Widget _drawProducts() {
-    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    String _number = Provider.of<AccountProvider>(context,listen: false).phoneNumber == '' ?
+    Provider.of<AuthProvider>(context,listen: false).userModel.phoneNumber:
+    Provider.of<AccountProvider>(context,listen: false).phoneNumber;
+    print("aaaaaaaaaaaaaaaaaaaa $_number");
     return Container(
       child: StreamBuilder<QuerySnapshot>(
-        stream: Firestore.instance
+        stream: FirebaseFirestore.instance
             .collection('users')
-            .where('phoneNumber', isEqualTo: authProvider.userModel.phoneNumber)
+            .where('phoneNumber', isEqualTo: _number)
             .snapshots(),
         builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
           if (snapshot.hasError) return new Text('0.0');
@@ -190,21 +186,23 @@ class _MoneyScreenState extends State<MoneyScreen> {
                 child: CircularProgressIndicator(),
               );
             default:
-              return snapshot.data.size == 0
-                  ? Text(
-                      "0.0",
-                      style: TextStyle(
-                          fontSize: 60,
-                          color: HexColor('#2c6bec'),
-                          fontWeight: FontWeight.w900),
-                    )
-                  : Text(
-                      " ${snapshot.data.docs[0]['profit']}",
-                      style: TextStyle(
-                          fontSize: 60,
-                          color: HexColor('#2c6bec'),
-                          fontWeight: FontWeight.w900),
-                    );
+              if (snapshot.data.size == 0) {
+                return Text(
+                  "0.0",
+                  style: TextStyle(
+                      fontSize: 60,
+                      color: HexColor('#2c6bec'),
+                      fontWeight: FontWeight.w900),
+                );
+              } else {
+                return Text(
+                    " ${snapshot.data.docs[0]['profit'].toString() }",
+                    style: TextStyle(
+                        fontSize: 60,
+                        color: HexColor('#2c6bec'),
+                        fontWeight: FontWeight.w900),
+                  );
+              }
           }
         },
       ),

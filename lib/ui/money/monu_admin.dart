@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:esay/models/mony.dart';
 import 'package:esay/ui/money/anlitxt.dart';
+
+
 class MoneyAdmin extends StatefulWidget {
   const MoneyAdmin({Key key}) : super(key: key);
 
@@ -11,6 +12,10 @@ class MoneyAdmin extends StatefulWidget {
 }
 
 class _MoneyAdminState extends State<MoneyAdmin> {
+  List<int> myList = [];
+  List<int> customer = [];
+  List<int> total = [];
+  List<int> profitUser = [];
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -44,14 +49,80 @@ class _MoneyAdminState extends State<MoneyAdmin> {
               _mode(),
             ],
           ),
-          SizedBox(height: 20,),
+          SizedBox(
+            height: 20,
+          ),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
               _money(),
               InkWell(
-                onTap: (){
-                  Navigator.push(context, MaterialPageRoute(builder: (_)=>AnlTs()));
+                onTap: () async {
+
+                  final _firebase = FirebaseFirestore.instance;
+                  await _firebase
+                      .collection("sharing_users")
+                      .get()
+                      .then((value) {
+                    value.docs.forEach((element1) {
+                      if (myList
+                          .every((eleent) => eleent != element1['easyCost'])) {
+                        myList.add(element1['easyCost'].toInt());
+                      }
+                      //myList.add(element['easyCost']);
+                    });
+                  }).then((value) async {
+                    final _firebase = FirebaseFirestore.instance;
+                    await _firebase.collection("stores").get().then((value) {
+                      value.docs.forEach((eleme) {
+                        int addCus = int.parse(eleme['customers']);
+                        var addTotal = double.parse(eleme['total']);
+                        print(addTotal);
+                        customer.add(addCus);
+                        total.add(addTotal.toInt());
+                        //myList.add(element['easyCost']);
+                      });
+                    });
+                    _firebase.collection("users").get().then((value) {
+                      value.docs.forEach((eleme) {
+                        print(eleme['profit']);
+                        profitUser.add(eleme['profit'].toInt());
+                        print(profitUser);
+                        //myList.add(element['easyCost']);
+                      });
+                      num sum = 0;
+                      num numb = 0;
+                      num cust = 0;
+                      num ttal = 0;
+                      customer.forEach((num e) {
+                        cust += e;
+                      });
+                      total.forEach((num e) {
+                        ttal += e;
+                      });
+                      myList.forEach((num e) {
+                        sum += e;
+                      });
+                      profitUser.forEach((num e) {
+                        numb += e;
+                      });
+                      print(numb);
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (_) => AnlTs(
+                                    number: sum.toString(),
+                                    profit: numb.toString(),
+                                    customer: cust.toString(),
+                                    total: ttal.toString(),
+                                  )));
+                    }).then((value) {
+                      myList.clear();
+                      profitUser.clear();
+                      customer.clear();
+                      total.clear();
+                    });
+                  });
                 },
                 child: Container(
                   alignment: Alignment.center,
@@ -94,7 +165,6 @@ class _MoneyAdminState extends State<MoneyAdmin> {
 
   Widget checkPr(int nmber, var length) {
     if (length.length == 0) {
-      print("11111");
       return Text(
         "${nmber.toString()}",
         style: TextStyle(
@@ -109,7 +179,7 @@ class _MoneyAdminState extends State<MoneyAdmin> {
 
   Widget _drawProucts(String id, IconData icon) {
     return StreamBuilder<QuerySnapshot>(
-      stream: Firestore.instance.collection(id).snapshots(),
+      stream: FirebaseFirestore.instance.collection(id).snapshots(),
       builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
         if (snapshot.hasError) return new Text('Error: ${snapshot.error}');
         switch (snapshot.connectionState) {
@@ -156,7 +226,7 @@ class _MoneyAdminState extends State<MoneyAdmin> {
 
   Widget _codesActive() {
     return StreamBuilder<QuerySnapshot>(
-      stream: Firestore.instance
+      stream: FirebaseFirestore.instance
           .collection('codes')
           .where("close", isEqualTo: true)
           .snapshots(),
@@ -206,7 +276,7 @@ class _MoneyAdminState extends State<MoneyAdmin> {
 
   Widget _codeNuActive() {
     return StreamBuilder<QuerySnapshot>(
-      stream: Firestore.instance
+      stream: FirebaseFirestore.instance
           .collection("codes")
           .where("close", isEqualTo: false)
           .snapshots(),
@@ -256,7 +326,7 @@ class _MoneyAdminState extends State<MoneyAdmin> {
 
   Widget _offer() {
     return StreamBuilder<QuerySnapshot>(
-      stream: Firestore.instance.collection("offers").snapshots(),
+      stream: FirebaseFirestore.instance.collection("offers").snapshots(),
       builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
         if (snapshot.hasError) return new Text('Error: ${snapshot.error}');
         switch (snapshot.connectionState) {
@@ -303,7 +373,7 @@ class _MoneyAdminState extends State<MoneyAdmin> {
 
   Widget _stores() {
     return StreamBuilder<QuerySnapshot>(
-      stream: Firestore.instance.collection("stores").snapshots(),
+      stream: FirebaseFirestore.instance.collection("stores").snapshots(),
       builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
         if (snapshot.hasError) return new Text('Error: ${snapshot.error}');
         switch (snapshot.connectionState) {
@@ -350,7 +420,7 @@ class _MoneyAdminState extends State<MoneyAdmin> {
 
   Widget _mode() {
     return StreamBuilder<QuerySnapshot>(
-      stream: Firestore.instance.collection("tools").snapshots(),
+      stream: FirebaseFirestore.instance.collection("tools").snapshots(),
       builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
         if (snapshot.hasError) return new Text('Error: ${snapshot.error}');
         switch (snapshot.connectionState) {
@@ -398,7 +468,7 @@ class _MoneyAdminState extends State<MoneyAdmin> {
 
   Widget _money() {
     return StreamBuilder<QuerySnapshot>(
-      stream: Firestore.instance.collection("sharing_users").snapshots(),
+      stream: FirebaseFirestore.instance.collection("sharing_users").snapshots(),
       builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
         if (snapshot.hasError) return new Text('Error: ${snapshot.error}');
         switch (snapshot.connectionState) {

@@ -7,129 +7,18 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:430059540092:android:3b7a0da02f21a98c2503f9",
+        "mobilesdk_app_id": "1:430059540092:android:a1abb1da1b86a49f2503f9",
         "android_client_info": {
-          "package_name": "com.easy.easy"
+          "package_name": "com.easyapppal.easy"
         }
       },
       "oauth_client": [
         {
-          "client_id": "430059540092-beb70jv1i40s0bir4hgcuc93h4hmgj6c.apps.googleusercontent.com",
+          "client_id": "430059540092-i9pm6rkisr4sge504g62c10mqfbol6l0.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.easy.easy",
-            "certificate_hash": "724933c7f2827e3d2981a3b301ccd87d07c7ccb8"
-          }
-        },
-        {
-          "client_id": "430059540092-bkkpva1gnoseu067bhqv1gt5p2i467bc.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
-      "api_key": [
-        {
-          "current_key": "AIzaSyCjN6rg8HoBxCGfdUoauDTZqBhMkoKyffE"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "430059540092-bkkpva1gnoseu067bhqv1gt5p2i467bc.apps.googleusercontent.com",
-              "client_type": 3
-            }
-          ]
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:430059540092:android:420750c461c5aa1c2503f9",
-        "android_client_info": {
-          "package_name": "com.esaycompinyname.esay"
-        }
-      },
-      "oauth_client": [
-        {
-          "client_id": "430059540092-jj5tuusg0djespj4okesvrkk2687mqso.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.esaycompinyname.esay",
-            "certificate_hash": "def663c1c27816392d3e1fc2be04162f3296ec74"
-          }
-        },
-        {
-          "client_id": "430059540092-bkkpva1gnoseu067bhqv1gt5p2i467bc.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
-      "api_key": [
-        {
-          "current_key": "AIzaSyCjN6rg8HoBxCGfdUoauDTZqBhMkoKyffE"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "430059540092-bkkpva1gnoseu067bhqv1gt5p2i467bc.apps.googleusercontent.com",
-              "client_type": 3
-            }
-          ]
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:430059540092:android:da549dde2bffb6222503f9",
-        "android_client_info": {
-          "package_name": "com.example.testq"
-        }
-      },
-      "oauth_client": [
-        {
-          "client_id": "430059540092-iokcp50c7205jf8uujtfa6mu29i24ffs.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.example.testq",
-            "certificate_hash": "3a38663e41adc617ff818d811d2dd96cd95b29bb"
-          }
-        },
-        {
-          "client_id": "430059540092-bkkpva1gnoseu067bhqv1gt5p2i467bc.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
-      "api_key": [
-        {
-          "current_key": "AIzaSyCjN6rg8HoBxCGfdUoauDTZqBhMkoKyffE"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "430059540092-bkkpva1gnoseu067bhqv1gt5p2i467bc.apps.googleusercontent.com",
-              "client_type": 3
-            }
-          ]
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:430059540092:android:db1a2149043d3e122503f9",
-        "android_client_info": {
-          "package_name": "com.example.untitled1"
-        }
-      },
-      "oauth_client": [
-        {
-          "client_id": "430059540092-ejssbbc6ogil18al794jhn90fs8upq6f.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.example.untitled1",
-            "certificate_hash": "def663c1c27816392d3e1fc2be04162f3296ec74"
+            "package_name": "com.easyapppal.easy",
+            "certificate_hash": "2b6e3d5e7c24a578b17f5916e5c2e0ebfdf49027"
           }
         },
         {

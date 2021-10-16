@@ -5,7 +5,6 @@ import 'package:esay/providers/bottom_animation_provider.dart';
 import 'package:esay/providers/code_provider.dart';
 import 'package:esay/providers/loading_provider.dart';
 import 'package:esay/services/firestore_database.dart';
-import 'package:esay/widgetEdit/qr_reade.dart';
 import 'package:esay/widgets/loading.dart';
 import 'package:esay/widgets/show_toast.dart';
 import 'package:flutter/cupertino.dart';
@@ -14,7 +13,7 @@ import 'package:hexcolor/hexcolor.dart';
 import 'package:provider/provider.dart';
 import '../../app_localizations.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
+// import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 
 class StoreConfirmationScreen extends StatefulWidget {
   StoreConfirmationScreen({this.storeModel});
@@ -29,7 +28,7 @@ class _StoreConfirmationScreenState extends State<StoreConfirmationScreen> {
   TextEditingController _beforOfferController = TextEditingController(text: "");
   TextEditingController _afterOfferController = TextEditingController(text: "");
   String code;
-  bool check_code = false;
+
   @override
   Widget build(BuildContext context) {
     final codeProvider = Provider.of<CodeProvider>(context, listen: false);
@@ -101,18 +100,18 @@ class _StoreConfirmationScreenState extends State<StoreConfirmationScreen> {
                                     ),
                                     onTap: () async {
                                       try {
-                                        final qrCode =
+                                       /* final qrCode =
                                             await FlutterBarcodeScanner
                                                 .scanBarcode(
                                           '#ff6666',
                                           'Cancel',
                                           true,
                                           ScanMode.QR,
-                                        );
+                                        );*/
                                         if (!mounted) return;
                                         setState(() {
-                                          code = qrCode;
-                                          _codeController.text = qrCode;
+                                          // code = qrCode;
+                                          // _codeController.text = qrCode;
                                         });
                                         if (_codeController.text.isNotEmpty) {
                                           print(
@@ -308,7 +307,6 @@ class _StoreConfirmationScreenState extends State<StoreConfirmationScreen> {
                                     String customerNow =
                                         (int.parse(data[0]["customersNow"]) + 1)
                                             .toString();
-
                                     await firestoreDatabase.calcOffer(
                                         context,
                                         widget.storeModel.password,
@@ -321,6 +319,9 @@ class _StoreConfirmationScreenState extends State<StoreConfirmationScreen> {
                                     _codeController.clear();
                                     _beforOfferController.clear();
                                     _afterOfferController.clear();
+                                  }else{
+                                    showToast(
+                                        "errorOfferCalc", Colors.red, context);
                                   }
                                 } else {
                                   showToast(

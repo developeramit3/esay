@@ -2,16 +2,17 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:esay/models/store_model.dart';
 import 'package:esay/providers/loading_provider.dart';
 import 'package:esay/providers/store_provider.dart';
-import 'package:esay/services/firestore_database.dart';
 import 'package:esay/widgets/loading.dart';
 import 'package:esay/widgets/validate_phone.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
+// import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:provider/provider.dart';
 import '../../app_localizations.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
 
 class StoreSharingScreen extends StatefulWidget {
   StoreSharingScreen({this.storeModel, this.scaffoldKey});
@@ -25,9 +26,10 @@ class _StoreSharingScreenState extends State<StoreSharingScreen> {
   TextEditingController _codeStoreController = TextEditingController(text: "");
   TextEditingController _phoneController;
   String countryCode = "+970";
-  int tab = 1;
+  int tab = 0;
   int cont = 0;
   String codeDs;
+  bool _check = false;
   final _formKey = GlobalKey<FormState>();
   final FocusNode _phoneFocus = FocusNode();
 
@@ -194,6 +196,7 @@ class _StoreSharingScreenState extends State<StoreSharingScreen> {
                         onTap: () {
                           setState(() {
                             tab = 1;
+                            _check = true;
                             cont = snapshot.data.docs[0]['12month'];
                           });
                         },
@@ -233,6 +236,7 @@ class _StoreSharingScreenState extends State<StoreSharingScreen> {
                           }
                           setState(() {
                             tab = 2;
+                            _check = true;
                             cont = snapshot.data.docs[0]['6month'];
                           });
                         },
@@ -270,7 +274,8 @@ class _StoreSharingScreenState extends State<StoreSharingScreen> {
                           }
                           setState(() {
                             tab = 3;
-                            cont =snapshot.data.docs[0]['1month'];
+                            _check = true;
+                            cont = snapshot.data.docs[0]['1month'];
                           });
                         },
                         child: Container(
@@ -351,22 +356,25 @@ class _StoreSharingScreenState extends State<StoreSharingScreen> {
                       controller: _codeStoreController,
                       decoration: InputDecoration(
                         icon: InkWell(
-                            child: Image.asset('assets/images/QR scan.png',height: 30,width: 30,),
+                            child: Image.asset(
+                              'assets/images/QR scan.png',
+                              height: 30,
+                              width: 30,
+                            ),
                             onTap: () async {
                               try {
-                                final qrCode =
-                                await FlutterBarcodeScanner
-                                    .scanBarcode(
+                              /*  final qrCode =
+                                    await FlutterBarcodeScanner.scanBarcode(
                                   '#ff6666',
                                   'Cancel',
                                   true,
                                   ScanMode.QR,
-                                );
+                                );*/
                                 if (!mounted) return;
                                 setState(() {
-                                  codeDs = qrCode;
-                                  _codeStoreController.text = qrCode;
-                                });
+                                  // codeDs = qrCode;
+                                  // _codeStoreController.text = qrCode;
+                                } );
                               } on PlatformException {
                                 codeDs = 'Failed to get platform version.';
                               }
@@ -432,58 +440,75 @@ class _StoreSharingScreenState extends State<StoreSharingScreen> {
                   builder: (context, loadingProvider, _) {
                 return loadingProvider.getLoading
                     ? Container(height: 48, child: loadingBtn(context))
-                    : FlatButton(
-                        onPressed: () async {
-                          final storePovider =
-                              Provider.of<StorePovider>(context, listen: false);
-                          if (_formKey.currentState.validate()) {
-                            _phoneFocus.unfocus();
-                            String phone = countryCode + _phoneController.text;
-                            double calc;
-                            double easyCost;
-                            if (tab == 1) {
-                              calc = cont - 5.0;
-                              easyCost = storePovider.getEasyCost + calc;
-                            } else if (tab == 2) {
-                              calc = cont - 3.0;
-                              easyCost = storePovider.getEasyCost + calc;
-                            } else {
-                              calc = cont - 2.0;
-                              easyCost = storePovider.getEasyCost + calc;
-                            }
-                            String code = _codeStoreController.text;
-                            int days = tab == 1
-                                ? 360
-                                : tab == 2
-                                    ? 180
-                                    : 30;
-                            print(days);
-                            print(calc);
-                            print(code);
-                            validatePhone(
+                    : InkWell(
+                        onTap: () async {
+                          if (_check == true) {
+                            final storePovider = Provider.of<StorePovider>(
                                 context,
-                                _codeStoreController.text.trim(),
-                                code,
-
-                                phone,
-                                widget.storeModel.id,
-                                days,
-                                calc,
-                                easyCost.toStringAsFixed(1),
-                                widget.scaffoldKey,
-                                widget.storeModel.name);
-                            _phoneController.clear();
-                            _codeStoreController.clear();
+                                listen: false);
+                            if (_formKey.currentState.validate()) {
+                              _phoneFocus.unfocus();
+                              String phone =
+                                  countryCode + _phoneController.text;
+                              double calc;
+                              double easyCost;
+                              if (tab == 1) {
+                                calc = cont - 0.0;
+                                easyCost = storePovider.getEasyCost + calc;
+                              } else if (tab == 2) {
+                                calc = cont - 3.0;
+                                easyCost = storePovider.getEasyCost + calc;
+                              } else {
+                                calc = cont - 2.0;
+                                easyCost = storePovider.getEasyCost + calc;
+                              }
+                              String code = _codeStoreController.text;
+                              int days = tab == 1
+                                  ? 360
+                                  : tab == 2
+                                      ? 180
+                                      : 30;
+                              print(days);
+                              print(calc);
+                              print(code);
+                              validatePhone(
+                                  context,
+                                  _codeStoreController.text.trim(),
+                                  code,
+                                  phone,
+                                  widget.storeModel.id,
+                                  days,
+                                  calc,
+                                  easyCost.toStringAsFixed(1),
+                                  widget.scaffoldKey,
+                                  widget.storeModel.name);
+                              _phoneController.clear();
+                              _codeStoreController.clear();
+                            }
+                          } else {
+                            Fluttertoast.showToast(
+                                msg: "رجاء تحديد مدة الاشتراك",
+                                backgroundColor: Colors.red,
+                                gravity: ToastGravity.CENTER);
                           }
                         },
-                        child: Text(
-                          AppLocalizations.of(context).translate('storeShare9'),
-                          style: TextStyle(
-                              fontSize: 26,
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold),
+                        child: Container(
+                          alignment: Alignment.center,
+                          height: 50,
+                          width: 100,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Text(
+                            AppLocalizations.of(context)
+                                .translate('storeShare9'),
+                            style: TextStyle(
+                                fontSize: 26,
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold),
+                          ),
                         ));
               })),
-        ]));//598427047
+        ])); //598427047
   }
 }

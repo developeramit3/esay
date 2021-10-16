@@ -34,7 +34,7 @@ class UnorderedListItem extends StatelessWidget {
           Expanded(
             child: Text(text,
                 style: TextStyle(
-                    fontSize: 17, color: HexColor("#000000"), wordSpacing: -1)),
+                    fontSize: 17, color: HexColor("#000000"), wordSpacing: 2)),
           ),
         ],
       ),

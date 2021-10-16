@@ -1,9 +1,9 @@
-import 'package:advance_pdf_viewer/advance_pdf_viewer.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_cached_pdfview/flutter_cached_pdfview.dart';
 
 import 'appbar.dart';
 class PdfReadFile extends StatefulWidget {
-  final PDFDocument document;
+  final String document;
   const PdfReadFile({Key key, this.document}) : super(key: key);
 
   @override
@@ -16,7 +16,11 @@ class _PdfReadFileState extends State<PdfReadFile> {
     return Scaffold(
       appBar:appBar(context, "Home", showBack: true),
       body:  Center(
-          child: PDFViewer(document:widget.document)),
+          child: PDF().cachedFromUrl(
+            widget.document,
+            placeholder: (double progress) => Center(child: Text('$progress %')),
+            errorWidget: (dynamic error) => Center(child: Text(error.toString())),
+          ),),
     );
   }
 }

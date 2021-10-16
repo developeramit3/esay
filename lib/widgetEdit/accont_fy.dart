@@ -1,13 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:esay/functions/check_auth.dart';
 import 'package:esay/widgetEdit/test.dart';
 import 'package:flutter_countdown_timer/current_remaining_time.dart';
 import 'package:flutter_countdown_timer/flutter_countdown_timer.dart';
 import '../app_localizations.dart';
 import 'package:esay/widgets/show_toast.dart';
-
+import 'package:provider/provider.dart';
+import 'package:esay/providers/account_provider.dart';
 class AccountFimPhone extends StatefulWidget {
   final String authNumber;
 
@@ -25,6 +25,7 @@ class _AccountFimPhoneState extends State<AccountFimPhone> {
     super.initState();
     _phoneController = TextEditingController(text: "");
   }
+
   @override
   void dispose() {
     _phoneController.dispose();
@@ -56,6 +57,7 @@ class _AccountFimPhoneState extends State<AccountFimPhone> {
                     height: 30,
                   ),
                   box,
+                  Provider.of<AccountProvider>(context,listen: false).userSize <= 150 ?
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -69,7 +71,7 @@ class _AccountFimPhoneState extends State<AccountFimPhone> {
                             TextStyle(color: Colors.orangeAccent, fontSize: 19),
                       ),
                     ],
-                  ),
+                  ):Container(),
                   box,
                   SizedBox(height: 30),
                   Container(
@@ -91,7 +93,7 @@ class _AccountFimPhoneState extends State<AccountFimPhone> {
                         ),
                         box,
                         Text(
-                          'ملاحظه: لا يمكن تغير الرقم بعد الضغط \n على التاكيد',
+                          'ملاحظة: لا يمكنك تغيير الرقم بعد الضغط \n على تأكيد',
                           style: TextStyle(
                               color: Colors.black,
                               fontSize: 21,
@@ -166,15 +168,6 @@ class _AccountFimPhoneState extends State<AccountFimPhone> {
                                                   fontWeight:
                                                       FontWeight.w900))),
                                       value: "+972",
-                                    ),
-                                    DropdownMenuItem(
-                                      child: Directionality(
-                                          textDirection: TextDirection.ltr,
-                                          child: Text("+20",
-                                              style: TextStyle(
-                                                  fontWeight:
-                                                      FontWeight.bold))),
-                                      value: "+2",
                                     ),
                                   ],
                                   onChanged: (value) {
@@ -289,8 +282,8 @@ class _AccountFimPhoneState extends State<AccountFimPhone> {
                       Column(
                           children: snapshot.data.docs.map((e) {
                         int endTime =
-                            e.data()["endDateTime"].millisecondsSinceEpoch +
-                                1000 * 30;
+                            e.data()/*["endDateTime"].millisecondsSinceEpoch +
+                                1000 * 30*/;
                         return CountdownTimer(
                           endTime: endTime,
                           widgetBuilder: (_, CurrentRemainingTime time) {

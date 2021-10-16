@@ -85,9 +85,6 @@ class _LoginStoreScreenState extends State<LoginStoreScreen> {
                         child: Directionality(
                           textDirection: TextDirection.ltr,
                           child: TextField(
-                            inputFormatters: [
-                              LengthLimitingTextInputFormatter(6),
-                            ],
                             textAlign: TextAlign.start,
                             style: TextStyle(
                                 color: Colors.black,

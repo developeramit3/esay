@@ -20,6 +20,7 @@ class _StoreHomeState extends State<StoreHome> {
   @override
   void initState() {
     super.initState();
+    print("widget.storeModel.name${widget.storeModel.password}");
     _scaffoldKey = GlobalKey<ScaffoldState>();
   }
 
@@ -28,7 +29,6 @@ class _StoreHomeState extends State<StoreHome> {
     _scaffoldKey.currentState.dispose();
     super.dispose();
   }
-
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(

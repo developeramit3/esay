@@ -3,10 +3,13 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:esay/caches/sharedpref/shared_preference_helper.dart';
 import 'package:esay/models/code_model.dart';
 import 'package:esay/providers/account_provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:esay/providers/auth_provider.dart';
 import 'package:esay/providers/bottom_animation_provider.dart';
 import 'package:esay/services/firestore_database.dart';
 import 'package:esay/widgets/navbar.dart';
+import 'package:esay/widgetEdit/test.dart';
+import 'package:esay/widgetEdit/dielog_fimly.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_countdown_timer/current_remaining_time.dart';
 import 'package:flutter_countdown_timer/flutter_countdown_timer.dart';
@@ -17,7 +20,7 @@ import '../../app_localizations.dart';
 import '../../widgets/appbar.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:esay/widgetEdit/dielog_qr.dart';
-import 'package:esay/widgetEdit/accont_fy.dart';
+
 class AccountScreen extends StatefulWidget {
   @override
   _AccountScreenState createState() => _AccountScreenState();
@@ -102,7 +105,6 @@ class _AccountScreenState extends State<AccountScreen> {
                 if (authProvider.userModel.phoneNumber.isNotEmpty)
                   accountProvider.getShowShare
                       ? InkWell(
-
                           child: imageSubs(
                               phone: authProvider.userModel.phoneNumber),
                         )
@@ -408,32 +410,67 @@ class _AccountScreenState extends State<AccountScreen> {
       ),
     );
   }
-
-
   Widget imageSubs({String phone}) {
-    if (Provider.of<AccountProvider>(context).tool == true &&
+    if (Provider.of<AccountProvider>(context).timeIsAfr == true) {
+      return Column(
+        children: [
+          widgetTimeAfter(phone),
+          InkWell(
+            onTap: () async {
+              SharedPreferences prefs = await SharedPreferences.getInstance();
+              if (prefs.getString('codeEasy') == null) {
+                SetNot.getCodeDis(context);
+              } else {
+                print("isEmpty");
+              }
+              final newRouteName = "/sharingScreen";
+              bool isNewRouteSameAsCurrent = false;
+              Navigator.popUntil(context, (route) {
+                if (route.settings.name == newRouteName) {
+                  isNewRouteSameAsCurrent = true;
+                }
+                return true;
+              });
+              if (!isNewRouteSameAsCurrent) {
+                Navigator.pushNamed(context, newRouteName);
+              }
+            },
+            child: Image.asset(
+              "assets/images/m1.png",
+              height: 200,
+              width: MediaQuery.of(context).size.width * 0.88,
+            ),
+          ),
+        ],
+      );
+    } else if (Provider.of<AccountProvider>(context).tool == true &&
         Provider.of<AccountProvider>(context).sub1 == false &&
         Provider.of<AccountProvider>(context).sub6 == false &&
         Provider.of<AccountProvider>(context).sub12 == false) {
       return InkWell(
-        onTap: (){
-
-          final newRouteName = "/sharingScreen";
-        bool isNewRouteSameAsCurrent = false;
-        Navigator.popUntil(context, (route) {
-          if (route.settings.name == newRouteName) {
-            isNewRouteSameAsCurrent = true;
+        onTap: () async {
+          SharedPreferences prefs = await SharedPreferences.getInstance();
+          if (prefs.getString('codeEasy') == null) {
+            SetNot.getCodeDis(context);
+          } else {
+            print("isEmpty");
           }
-          return true;
-        });
-        if (!isNewRouteSameAsCurrent) {
-          Navigator.pushNamed(context, newRouteName);
-        }
+          final newRouteName = "/sharingScreen";
+          bool isNewRouteSameAsCurrent = false;
+          Navigator.popUntil(context, (route) {
+            if (route.settings.name == newRouteName) {
+              isNewRouteSameAsCurrent = true;
+            }
+            return true;
+          });
+          if (!isNewRouteSameAsCurrent) {
+            Navigator.pushNamed(context, newRouteName);
+          }
         },
         child: Image.asset(
           "assets/images/m1.png",
           height: 200,
-          width: MediaQuery.of(context).size.width *0.88 ,
+          width: MediaQuery.of(context).size.width * 0.88,
         ),
       );
     } else if (Provider.of<AccountProvider>(context, listen: false).tool ==
@@ -468,9 +505,9 @@ class _AccountScreenState extends State<AccountScreen> {
                       ),
                       Column(
                           children: snapshot.data.docs.map((e) {
-                        int endTime =
-                            e.data()["endDateTime"].millisecondsSinceEpoch +
-                                1000 * 30;
+                        int endTime =1000 * 30;
+                            // e.data()["endDateTime"].millisecondsSinceEpoch +
+                            //     1000 * 30;
                         return CountdownTimer(
                           endTime: endTime,
                           widgetBuilder: (_, CurrentRemainingTime time) {
@@ -540,8 +577,8 @@ class _AccountScreenState extends State<AccountScreen> {
                       Column(
                           children: snapshot.data.docs.map((e) {
                         int endTime =
-                            e.data()["endDateTime"].millisecondsSinceEpoch +
-                                1000 * 30;
+                            e.data();/*["endDateTime"].millisecondsSinceEpoch +
+                                1000 * 30;*/
                         return CountdownTimer(
                           endTime: endTime,
                           widgetBuilder: (_, CurrentRemainingTime time) {
@@ -566,41 +603,43 @@ class _AccountScreenState extends State<AccountScreen> {
       );
     }
   }
-  Widget widget12m(String phone ) {
+
+  Widget widget12m(String phone) {
+    String number =
+        Provider.of<AccountProvider>(context, listen: false).phoneNumber;
+    print("this is phone number $number");
     return Center(
-        child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-        StreamBuilder<QuerySnapshot>(
+        child: Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
+      StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance
             .collection('sharing_users')
-            .where("phoneNumber", isEqualTo: phone)
+            .where("phoneNumber", isEqualTo: "$number")
             .snapshots(),
-      builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-        if (snapshot.hasError) return Container();
-        if (!snapshot.hasData) return Container();
-        switch (snapshot.connectionState) {
-          case ConnectionState.waiting:
-            return Container();
-          default:
-            return snapshot.data.size != 0
-                ? Container(
-                child: Column(children: [
-                  Text(
-                    "الوقت المتبقي للاشتراك",
-                    style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 18,
-                        fontWeight: FontWeight.w800),
-                  ),
-                  SizedBox(
-                    height: 10,
-                  ),
-                  Column(
-                      children: snapshot.data.docs.map((e) {
+        builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+          if (snapshot.hasError) return Container();
+          if (!snapshot.hasData) return Container();
+          switch (snapshot.connectionState) {
+            case ConnectionState.waiting:
+              return Container();
+            default:
+              return snapshot.data.size != 0
+                  ? Container(
+                      child: Column(children: [
+                      Text(
+                        "الوقت المتبقي للاشتراك",
+                        style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 18,
+                            fontWeight: FontWeight.w800),
+                      ),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      Column(
+                          children: snapshot.data.docs.map((e) {
                         int endTime =
-                            e.data()["endDateTime"].millisecondsSinceEpoch +
-                                1000 * 30;
+                            e.data()/*["endDateTime"].millisecondsSinceEpoch +
+                                1000 * 30*/;
                         return CountdownTimer(
                           endTime: endTime,
                           widgetBuilder: (_, CurrentRemainingTime time) {
@@ -616,26 +655,123 @@ class _AccountScreenState extends State<AccountScreen> {
                           },
                         );
                       }).toList()),
+                    ]))
+                  : Container(
+                      height: 150,
+                    );
+          }
+        },
+      ),
+      SizedBox(
+        height: 30,
+      ),
+      Provider.of<AccountProvider>(context, listen: false).userSize <= 150
+          ? Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.star, size: 35, color: Colors.orange),
+                SizedBox(
+                  width: 10,
+                ),
+                Text(
+                  " من اول 100 مشترك في التطبيق !",
+                  style: TextStyle(color: Colors.orangeAccent, fontSize: 19),
+                ),
+              ],
+            )
+          : Container(),
+      SizedBox(
+        height: 30,
+      ),
+      Provider.of<AccountProvider>(context, listen: false).fmll
+          ? Container()
+          : InkWell(
+              onTap: () {
+                showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return FaimlyCode(
+                        title: "رمز أيزي الخاص بك لهذا العرض هو",
+                        text: "شكرا !",
+                        code: '',
+                      );
+                    });
+              },
+              child: Container(
+                height: 60,
+                width: MediaQuery.of(context).size.width - 70,
+                color: HexColor('#f8f8ff').withOpacity(0.90),
+                child: Center(
+                  child: Text(
+                    "اضافة فرد من العاىْلة",
+                    style: TextStyle(
+                        color: Colors.black,
+                        fontWeight: FontWeight.w900,
+                        fontSize: 20),
+                  ),
+                ),
+              )),
+    ]));
+  }
 
-                ]))
-                : Container(
-              height: 150,
-            );
-        }
-      },
-    ),
-          Text(
-            "يوم",
-            style: TextStyle(
-                color: Colors.black, fontWeight: FontWeight.w800, fontSize: 18),
-          ),
-        SizedBox(
-          height: 60,
-        ), Text(
-   "اضافة فرد من العاىْلة",
-            style: TextStyle(
-                color: Colors.black, fontWeight: FontWeight.w900, fontSize: 20),
-          ),
-        ]));
+  Widget widgetTimeAfter(String phone) {
+    String number =
+        Provider.of<AccountProvider>(context, listen: false).phoneNumber;
+    print("this is phone number $number");
+    return Center(
+        child: Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
+      StreamBuilder<QuerySnapshot>(
+        stream: FirebaseFirestore.instance
+            .collection('sharing_users')
+            .where("phoneNumber", isEqualTo: "$number")
+            .snapshots(),
+        builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+          if (snapshot.hasError) return Container();
+          if (!snapshot.hasData) return Container();
+          switch (snapshot.connectionState) {
+            case ConnectionState.waiting:
+              return Container();
+            default:
+              return snapshot.data.size != 0
+                  ? Container(
+                      child: Column(children: [
+                      Text(
+                        "الوقت المتبقي للاشتراك",
+                        style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 18,
+                            fontWeight: FontWeight.w800),
+                      ),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      Column(
+                          children: snapshot.data.docs.map((e) {
+                        int endTime =
+                            e.data();/*["endDateTime"].millisecondsSinceEpoch +
+                                1000 * 30;*/
+                        return CountdownTimer(
+                          endTime: endTime,
+                          widgetBuilder: (_, CurrentRemainingTime time) {
+                            return Directionality(
+                                textDirection: TextDirection.rtl,
+                                child: Text(
+                                  time.days.toString() + " " + "يوم",
+                                  style: TextStyle(
+                                      fontSize: 16,
+                                      letterSpacing: 0.5,
+                                      fontWeight: FontWeight.bold),
+                                ));
+                          },
+                        );
+                      }).toList()),
+                    ]))
+                  : Container(
+                      height: 150,
+                    );
+          }
+        },
+      ),
+    ]));
   }
 }

@@ -1,8 +1,4 @@
-import 'dart:async';
-
-import 'package:esay/models/code_model.dart';
 import 'package:esay/widgetEdit/dielog_qr.dart';
-import 'package:esay/widgetEdit/test.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_countdown_timer/current_remaining_time.dart';
@@ -14,6 +10,7 @@ import '../../widgets/appbar.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:provider/provider.dart';
 import 'package:esay/providers/auth_provider.dart';
+
 class SharingScreen extends StatefulWidget {
   @override
   _SharingScreenState createState() => _SharingScreenState();
@@ -22,14 +19,16 @@ class SharingScreen extends StatefulWidget {
 class _SharingScreenState extends State<SharingScreen> {
   @override
   Widget build(BuildContext context) {
+    double w = MediaQuery.of(context).size.width;
+    double h = MediaQuery.of(context).size.height;
+    var padding = MediaQuery.of(context).padding;
     return Scaffold(
       appBar: appBar(context, "Home", showBack: true),
-      body: compine(),
+      body: compine(h, w, padding),
     );
   }
 
-  Widget compine() {
-
+  Widget compine(double h, w, EdgeInsets padding) {
     return StreamBuilder<QuerySnapshot>(
       stream: FirebaseFirestore.instance.collection('subscription').snapshots(),
       builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
@@ -41,7 +40,7 @@ class _SharingScreenState extends State<SharingScreen> {
             );
           default:
             return Container(
-                margin: EdgeInsets.all(16),
+                margin: EdgeInsets.all(18),
                 child: SingleChildScrollView(
                     child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -68,28 +67,28 @@ class _SharingScreenState extends State<SharingScreen> {
                               fontWeight: FontWeight.w900, fontSize: 20),
                         ),
                         SizedBox(
-                          height: 5,
+                          height: h * 0.01,
                         ),
                         Image.asset(
                           'assets/images/interesting.png',
-                          width: 35,
+                          width: w * 0.09,
                         ),
                       ],
                     ),
                     SizedBox(
-                      height: 20,
+                      height: h * 0.03,
                     ),
                     _dis(),
                     SizedBox(
-                      height: 20,
+                      height: h * 0.03,
                     ),
                     Container(
                         child: Column(children: [
                       Align(
                         alignment: Alignment(0.90, -0.9),
                         child: Container(
-                          height: 30,
-                          width: 100,
+                          height: h * 0.03,
+                          width: w * 0.3,
                           color: Colors.grey[200],
                           child: Center(
                               child: Row(
@@ -101,7 +100,7 @@ class _SharingScreenState extends State<SharingScreen> {
                                   color: Colors.orange[400],
                                 ),
                                 SizedBox(
-                                  width: 5,
+                                  width: w * 0.03,
                                 ),
                                 Text(
                                   AppLocalizations.of(context)
@@ -129,7 +128,7 @@ class _SharingScreenState extends State<SharingScreen> {
                                 style: TextStyle(
                                     color: Colors.white,
                                     fontWeight: FontWeight.w900,
-                                    fontSize: 23),
+                                    fontSize: w * 0.05),
                               ),
                               Row(
                                 crossAxisAlignment: CrossAxisAlignment.center,
@@ -137,28 +136,29 @@ class _SharingScreenState extends State<SharingScreen> {
                                   Text(
                                     "${snapshot.data.docs[0]['12month_b']}.",
                                     style: TextStyle(
-                                        fontWeight: FontWeight.w900,
                                         color: Colors.white,
-                                        fontSize: 16),
+                                        fontSize: w * 0.04),
                                   ),
                                   Text(
                                     "${snapshot.data.docs[0]["12month"]}",
                                     style: TextStyle(
                                         color: Colors.white,
-                                        fontWeight: FontWeight.w900,
-                                        fontSize: 20),
+                                        fontSize: w * 0.05),
+                                  ),
+                                  SizedBox(
+                                    width: w * 0.01,
                                   ),
                                   Image.asset(
-                                    'assets/images/shekel currency.png',
-                                    width: 20,
-                                    height: 20,
+                                    'assets/images/shekel currency blue.png',
+                                    width: w * 0.04,
+                                    height: h * 0.03,
                                     color: Colors.white,
                                   ),
                                 ],
                               ),
                               Column(children: [
                                 SizedBox(
-                                  height: 10,
+                                  height: w * 0.04,
                                 ),
                                 Row(
                                     mainAxisAlignment:
@@ -173,21 +173,22 @@ class _SharingScreenState extends State<SharingScreen> {
                                           Text(
                                             "${snapshot.data.docs[0]['12month_1_b']}.",
                                             style: TextStyle(
-                                                fontWeight: FontWeight.w900,
                                                 color: Colors.white,
-                                                fontSize: 16),
+                                                fontSize: w * 0.03),
                                           ),
                                           Text(
                                             "${snapshot.data.docs[0]["12month_1"]}",
                                             style: TextStyle(
                                                 color: Colors.white,
-                                                fontWeight: FontWeight.w900,
-                                                fontSize: 20),
+                                                fontSize: w * 0.05),
+                                          ),
+                                          SizedBox(
+                                            width: w * 0.01,
                                           ),
                                           Image.asset(
-                                            'assets/images/shekel currency.png',
-                                            width: 20,
-                                            height: 20,
+                                            'assets/images/shekel currency blue.png',
+                                            width: w * 0.04,
+                                            height: h * 0.03,
                                             color: Colors.white,
                                           ),
                                         ],
@@ -197,7 +198,7 @@ class _SharingScreenState extends State<SharingScreen> {
                                   "شهريا",
                                   style: TextStyle(
                                       color: Colors.white,
-                                      fontSize: 20,
+                                      fontSize: w * 0.04,
                                       fontWeight: FontWeight.bold),
                                 ),
                               ])
@@ -207,15 +208,29 @@ class _SharingScreenState extends State<SharingScreen> {
                       ),
                     ])),
                     Container(
-                      padding: EdgeInsets.only(right: 10),
+                      padding: EdgeInsets.only(right: w * 0.04),
                       alignment: Alignment.centerRight,
-                      child: Text(
-                        AppLocalizations.of(context).translate('sharing3'),
-                        style: TextStyle(fontSize: 17, color: Colors.grey[600]),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            AppLocalizations.of(context).translate('sharing3'),
+                            style: TextStyle(
+                                fontSize: w * 0.04, color: Colors.grey[600]),
+                          ),
+                          Text(
+                            '+ إضافة فرد من العائلة للاشتراك',
+                            style: TextStyle(
+                                fontSize: w * 0.04,
+                                color: Colors.grey[600],
+                                height: 0.9),
+                          ),
+                        ],
                       ),
                     ),
                     SizedBox(
-                      height: 10,
+                      height: h * 0.01,
                     ),
                     Container(
                       decoration: BoxDecoration(
@@ -234,77 +249,91 @@ class _SharingScreenState extends State<SharingScreen> {
                             style: TextStyle(
                                 color: HexColor('#2c6bec'),
                                 fontWeight: FontWeight.w900,
-                                fontSize: 23),
+                                fontSize: w * 0.05),
                           ),
                           Row(
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
-                              Text(
-                                "${snapshot.data.docs[0]['6month_b']}.",
-                                style: TextStyle(
-                                    fontWeight: FontWeight.w900,
-                                    color: HexColor('#2c6bec'),
-                                    fontSize: 16),
+                              Padding(
+                                padding: EdgeInsets.only(right: w * 0.02),
+                                child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      "${snapshot.data.docs[0]['6month_b']}.",
+                                      style: TextStyle(
+                                          color: HexColor('#2c6bec'),
+                                          fontSize: w * 0.03),
+                                    ),
+                                    Text(
+                                      "${snapshot.data.docs[0]["6month"]}",
+                                      style: TextStyle(
+                                          color: HexColor('#2c6bec'),
+                                          fontSize: w * 0.04),
+                                    ),
+                                  ],
+                                ),
                               ),
-                              Text(
-                                "${snapshot.data.docs[0]["6month"]}",
-                                style: TextStyle(
-                                    color: HexColor('#2c6bec'),
-                                    fontWeight: FontWeight.w900,
-                                    fontSize: 20),
+                              SizedBox(
+                                width: 3,
                               ),
                               Image.asset(
-                                'assets/images/shekel currency.png',
-                                width: 20,
-                                height: 20,
+                                'assets/images/shekel currency blue.png',
+                                width: w * 0.04,
+                                height: h * 0.03,
                                 color: HexColor('#2c6bec'),
                               ),
                             ],
                           ),
-                          Column(children: [
-                            SizedBox(
-                              height: 10,
-                            ),
-                            Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceAround,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Row(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    children: [
-                                      Text(
-                                        "${snapshot.data.docs[0]['6month_1_b']}.",
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.w900,
-                                            color: HexColor('#2c6bec'),
-                                            fontSize: 16),
-                                      ),
-                                      Text(
-                                        "${snapshot.data.docs[0]["6month_1"].toString()}",
-                                        style: TextStyle(
-                                            color: HexColor('#2c6bec'),
-                                            fontWeight: FontWeight.w900,
-                                            fontSize: 20),
-                                      ),
-                                      Image.asset(
-                                        'assets/images/shekel currency.png',
-                                        width: 20,
-                                        height: 20,
-                                        color: HexColor('#2c6bec'),
-                                      ),
-                                    ],
-                                  ),
-                                ]),
-                            Text(
-                              "شهريا",
-                              style: TextStyle(
-                                  color: HexColor('#2c6bec'),
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold),
-                            ),
-                          ])
+                          Padding(
+                            padding: EdgeInsets.only(right: w * 0.01),
+                            child: Column(children: [
+                              SizedBox(
+                                height: w * 0.02,
+                              ),
+                              Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceAround,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      children: [
+                                        Text(
+                                          "${snapshot.data.docs[0]['6month_1_b']}.",
+                                          style: TextStyle(
+                                              color: HexColor('#2c6bec'),
+                                              fontSize: w * 0.03),
+                                        ),
+                                        Text(
+                                          "${snapshot.data.docs[0]["6month_1"].toString()}",
+                                          style: TextStyle(
+                                              color: HexColor('#2c6bec'),
+                                              fontSize: w * 0.04),
+                                        ),
+                                        SizedBox(
+                                          width: 3,
+                                        ),
+                                        Image.asset(
+                                          'assets/images/shekel currency blue.png',
+                                          width: w * 0.04,
+                                          height: h * 0.03,
+                                          color: HexColor('#2c6bec'),
+                                        ),
+                                      ],
+                                    ),
+                                  ]),
+                              Text(
+                                "شهريا",
+                                style: TextStyle(
+                                    color: HexColor('#2c6bec'),
+                                    fontSize: w * 0.04,
+                                    fontWeight: FontWeight.bold),
+                              ),
+                            ]),
+                          )
                         ],
                       ),
                     ),
@@ -313,11 +342,12 @@ class _SharingScreenState extends State<SharingScreen> {
                       alignment: Alignment.centerRight,
                       child: Text(
                         AppLocalizations.of(context).translate('sharing4'),
-                        style: TextStyle(fontSize: 17, color: Colors.grey[600]),
+                        style: TextStyle(
+                            fontSize: w * 0.04, color: Colors.grey[600]),
                       ),
                     ),
                     SizedBox(
-                      height: 10,
+                      height: w * 0.02,
                     ),
                     Container(
                       decoration: BoxDecoration(
@@ -333,16 +363,19 @@ class _SharingScreenState extends State<SharingScreen> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            Text(
-                              "1 شهر",
-                              style: TextStyle(
-                                  color: HexColor('#2c6bec'),
-                                  fontWeight: FontWeight.w900,
-                                  fontSize: 23),
+                            Padding(
+                              padding: EdgeInsets.only(right: 10),
+                              child: Text(
+                                "1 شهر",
+                                style: TextStyle(
+                                    color: HexColor('#2c6bec'),
+                                    fontWeight: FontWeight.w900,
+                                    fontSize: w * 0.05),
+                              ),
                             ),
                             Column(children: [
                               SizedBox(
-                                height: 10,
+                                height: w * 0.02,
                               ),
                               Row(
                                   mainAxisAlignment:
@@ -356,21 +389,22 @@ class _SharingScreenState extends State<SharingScreen> {
                                         Text(
                                           "${snapshot.data.docs[0]['1month_b']}.",
                                           style: TextStyle(
-                                              fontWeight: FontWeight.w900,
                                               color: HexColor('#2c6bec'),
-                                              fontSize: 16),
+                                              fontSize: w * 0.03),
                                         ),
                                         Text(
                                           "${snapshot.data.docs[0]["1month"].toString()}",
                                           style: TextStyle(
                                               color: HexColor('#2c6bec'),
-                                              fontWeight: FontWeight.w900,
-                                              fontSize: 20),
+                                              fontSize: w * 0.04),
+                                        ),
+                                        SizedBox(
+                                          width: 3,
                                         ),
                                         Image.asset(
-                                          'assets/images/shekel currency.png',
-                                          width: 20,
-                                          height: 20,
+                                          'assets/images/shekel currency blue.png',
+                                          width: w * 0.04,
+                                          height: h * 0.03,
                                           color: HexColor('#2c6bec'),
                                         ),
                                       ],
@@ -380,7 +414,7 @@ class _SharingScreenState extends State<SharingScreen> {
                                 "شهريا",
                                 style: TextStyle(
                                     color: HexColor('#2c6bec'),
-                                    fontSize: 20,
+                                    fontSize: w * 0.04,
                                     fontWeight: FontWeight.bold),
                               ),
                             ])
@@ -389,11 +423,12 @@ class _SharingScreenState extends State<SharingScreen> {
                       ),
                     ),
                     Container(
-                      padding: EdgeInsets.only(right: 13),
+                      padding: EdgeInsets.only(right: 10),
                       alignment: Alignment.centerRight,
                       child: Text(
                         AppLocalizations.of(context).translate('sharing5'),
-                        style: TextStyle(fontSize: 17, color: Colors.grey[600]),
+                        style: TextStyle(
+                            fontSize: w * 0.04, color: Colors.grey[600]),
                       ),
                     ),
                     SizedBox(
@@ -424,6 +459,7 @@ class _SharingScreenState extends State<SharingScreen> {
       },
     );
   }
+
   Widget _dis() {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     return FutureBuilder(
@@ -432,11 +468,16 @@ class _SharingScreenState extends State<SharingScreen> {
             .doc(authProvider.userModel.phoneNumber)
             .get(),
         builder: (context, snap) {
-          return snap.hasData ? diKiontCheck(snap) : Container();
+          return snap.hasData
+              ? snap.data != 0
+                  ? diKiontCheck(snap)
+                  : Container()
+              : Container();
         });
   }
 
   Widget diKiontCheck(AsyncSnapshot sna) {
+    print("${sna.data['notf'].toString()}");
     if (sna.data['notf'].toString().isNotEmpty) {
       print("qqqqqqqqqqq");
       if (sna.data['notf'].toDate().isAfter(DateTime.now())) {
@@ -454,7 +495,7 @@ class _SharingScreenState extends State<SharingScreen> {
                     height: 10,
                   ),
                   Text(
-                    'خصم على اشتراك أيزي السنوي لفترة محدودة',
+                    'خصم على اشتراك إيزي السنوي لفترة محدودة',
                     style: TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
@@ -471,7 +512,7 @@ class _SharingScreenState extends State<SharingScreen> {
                             return CustomDialogQr(
                               title: "رمز أيزي الخاص بك لهذا العرض هو",
                               text: "شكرا !",
-                              code: sna.data['codeEasy'],
+                              code: "${sna.data['codeEasy'].toString()}",
                             );
                           });
                     },
@@ -479,7 +520,7 @@ class _SharingScreenState extends State<SharingScreen> {
                       width: 60,
                       height: 60,
                       child: QrImage(
-                        data: sna.data['codeEasy'],
+                        data: "${sna.data['codeEasy'].toString()}",
                         version: QrVersions.auto,
                         //size: 50.0,
                         foregroundColor: Colors.white,
@@ -490,7 +531,7 @@ class _SharingScreenState extends State<SharingScreen> {
                     height: 10,
                   ),
                   Text(
-                    "استخدام هذه الرمز عند الاشتراك لتحصل على خصم 20 %",
+                    "استخدم هذا الرمز عند الاشتراك لتحصل على خصم 25%",
                     style: TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.w400,
@@ -503,7 +544,7 @@ class _SharingScreenState extends State<SharingScreen> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        "ينتهي هذه الخصم خلال : ",
+                        "ينتهي هذا الخصم خلال : ",
                         style: TextStyle(
                             color: Colors.white,
                             fontSize: 18,

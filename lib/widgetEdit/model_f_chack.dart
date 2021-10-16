@@ -4,10 +4,12 @@ import 'package:esay/functions/save_code.dart';
 import 'package:esay/models/offer_model.dart';
 import 'package:esay/models/store_model.dart';
 import 'package:esay/providers/auth_provider.dart';
+import 'package:esay/providers/bottom_animation_provider.dart';
 import 'package:esay/providers/code_provider.dart';
 import 'package:esay/providers/loading_provider.dart';
 import 'package:esay/widgets/code_offer.dart';
 import 'package:esay/widgets/show_toast.dart';
+import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:esay/providers/account_provider.dart';
 
@@ -15,29 +17,11 @@ class GetCodeEdit {
   static void check_sub(
       context, OfferModel offerModel, StoreModel storeModel) async {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final cIndexProvider = Provider.of<CIndexProvider>(context, listen: false);
     final loadingProvider =
         Provider.of<LoadingProvider>(context, listen: false);
     loadingProvider.changeLoading(true);
     print(offerModel.id);
-    await FirebaseFirestore.instance
-        .collection("codes")
-        .where("close", isEqualTo: false)
-        .where("user_id", isEqualTo: authProvider.userModel.phoneNumber)
-        .get()
-        .then((value) {
-      value.docs.forEach((element) {
-        if (element["endDateTime"].toDate().isAfter(DateTime.now())) {
-          print(element["endDateTime"].toDate());
-        } else {
-          Firestore.instance
-              .collection("codes")
-              .doc(element.id)
-              .delete()
-              .then((value) => print("sessfly"));
-          print("else ${element["endDateTime"].toDate()}");
-        }
-      });
-    });
     await FirebaseFirestore.instance
         .collection("codes")
         .where("offerId", isEqualTo: offerModel.id)
@@ -72,11 +56,15 @@ class GetCodeEdit {
             if (count <= subs["subscription_1"]) {
               print("subscription1");
               getCodeEasy(context, offerModel, storeModel);
+            } else {
+              dontHaveOfferCode(context);
             }
           } else if (subs["subscription6m"] == true) {
             if (count <= subs["subscription_6m"]) {
               print("subscription6m");
               getCodeEasy(context, offerModel, storeModel);
+            } else {
+              dontHaveOfferCode(context);
             }
           } else if (subs["subscription12m"] == true) {
             if (count <= subs["subscription_12m"]) {
@@ -85,9 +73,24 @@ class GetCodeEdit {
                   fam12m: true,
                   fam: subs['family'],
                   phoneFam: subs['family_phone']);
+            } else {
+              dontHaveOfferCode(context);
             }
           } else {
-            showToa(context);
+            Navigator.of(context).pop();
+            cIndexProvider.changeCIndex(3);
+            cIndexProvider.changeNameNav("account");
+            final newRouteName = "/sharingScreen";
+            bool isNewRouteSameAsCurrent = false;
+            Navigator.popUntil(context, (route) {
+              if (route.settings.name == newRouteName) {
+                isNewRouteSameAsCurrent = true;
+              }
+              return true;
+            });
+            if (!isNewRouteSameAsCurrent) {
+              Navigator.pushNamed(context, newRouteName);
+            }
           }
         });
       });
@@ -103,35 +106,47 @@ class GetCodeEdit {
     try {
       String id = Random().nextInt(1000000).toString();
       print(id);
-      if (free.isEmpty) {
+      if (free == null) {
+        print("#3id");
         FirebaseFirestore.instance.collection("codes").doc().set({
           "code": id,
           "user_id": authProvider.userModel.phoneNumber,
           "offerId": offerModel.id,
           "storeId": offerModel.store,
           "dateTime": DateTime.now(),
+          'free': false,
+          'free_3': false,
           "endDateTime":
               DateTime.now().add(Duration(hours: offerModel.timeCode)),
           "cost": "0.0",
           "close": false,
         }).then((_) {
-
+          GetCodeEdit.numCodeStack(
+            offerModel.id,
+          );
           String endDate = DateTime.now()
               .add(Duration(hours: offerModel.timeCode))
               .toString();
           addCode(context, id, storeModel.name, endDate);
           codeProvider.changeCode(id);
           loadingProvider.changeLoading(false);
-          showCodeDialog(context, id, offerModel.timeCode);
+          showDialog(
+              context: context,
+              builder: (context) {
+                return CodeGetShow(code: id, time: offerModel.timeCode);
+              });
           codeProvider.changeTimestamp(
               DateTime.now().add(Duration(hours: offerModel.timeCode)));
         }).then((_) {
+          print("###########################");
           if (fam12m != null && fam == true) {
             print('fam12m');
             FirebaseFirestore.instance.collection("codes").doc().set({
               "close": true,
               "user_id": phoneFam,
               "offerId": offerModel.id,
+              'free': false,
+              'free_3': false,
               "storeId": offerModel.store,
               "dateTime": DateTime.now(),
               "endDateTime":
@@ -144,9 +159,9 @@ class GetCodeEdit {
       } else {
         FirebaseFirestore.instance.collection("codes").doc().set({
           'free_3': true,
+          'free': false,
           "code": id,
           "user_id": authProvider.userModel.phoneNumber,
-          "open": false,
           "offerId": offerModel.id,
           "storeId": offerModel.store,
           "dateTime": DateTime.now(),
@@ -154,15 +169,21 @@ class GetCodeEdit {
               DateTime.now().add(Duration(hours: offerModel.timeCode)),
           "cost": "0.0",
           "close": false,
-          "tokenId": authProvider.userModel.tokenId
         }).then((_) {
+          GetCodeEdit.numCodeStack(
+            offerModel.id,
+          );
           String endDate = DateTime.now()
               .add(Duration(hours: offerModel.timeCode))
               .toString();
           addCode(context, id, storeModel.name, endDate);
           codeProvider.changeCode(id);
           loadingProvider.changeLoading(false);
-          showCodeDialog(context, id, offerModel.timeCode);
+          showDialog(
+              context: context,
+              builder: (context) {
+                return CodeGetShow(code: id, time: offerModel.timeCode);
+              });
           codeProvider.changeTimestamp(
               DateTime.now().add(Duration(hours: offerModel.timeCode)));
         }).then((_) async {
@@ -188,6 +209,7 @@ class GetCodeEdit {
                   .update({
                 'free_code': xx,
               }).then((_) {
+                String codeEa = Random().nextInt(1000000).toString();
                 Provider.of<AccountProvider>(context, listen: false)
                     .contr(use['free_code']);
                 if (usXod <= 0) {
@@ -197,7 +219,7 @@ class GetCodeEdit {
                       .update({
                     'notifications_check': false,
                     'notf': DateTime.now().add(Duration(hours: 72)),
-                    'codeEasy': id,
+                    'codeEasy': codeEa,
                   });
                 }
               });
@@ -209,5 +231,14 @@ class GetCodeEdit {
     } catch (e) {
       print(e.print);
     }
+  }
+
+  static Future<void> numCodeStack(String id) async {
+    FirebaseFirestore.instance.collection('offers').doc(id).get().then((value) {
+      int _x = value['numCodesTaken'] + 1;
+      FirebaseFirestore.instance.collection('offers').doc(id).update({
+        'numCodesTaken': _x,
+      });
+    });
   }
 }

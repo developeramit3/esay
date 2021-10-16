@@ -5,8 +5,6 @@ import 'package:esay/widgets/show_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
 
-import '../app_localizations.dart';
-import 'package:qr_flutter/qr_flutter.dart';
 
 showQDialog(
     BuildContext context,
@@ -28,8 +26,8 @@ showQDialog(
               overflow: Overflow.visible,
               alignment: Alignment.topCenter,
               children: [
+                buildConfettiWidget(controllerTopCenter, pi / 0.1),
                 buildConfettiWidget(controllerTopCenter, pi / 1),
-                buildConfettiWidget(controllerTopCenter, pi / 4),
                 Container(
                   height: 300,
                   child: Padding(
@@ -131,7 +129,7 @@ Align buildConfettiWidget(controller, double blastDirection) {
       blastDirectionality: BlastDirectionality.directional,
       maxBlastForce: 20, // set a lower max blast force
       minBlastForce: 8, // set a lower min blast force
-      emissionFrequency: 1,
+      emissionFrequency: 0.5,
       numberOfParticles: 8, // a lot of particles at once
       gravity: 1,
     ),

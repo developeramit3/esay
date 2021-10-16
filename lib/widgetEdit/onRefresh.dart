@@ -10,7 +10,6 @@ class OnRefresh {
      await FirebaseFirestore.instance.collection('tools')
         .doc('8ClVk2443dfOUbHrJWUz')
         .get().then((value) {
-
         return showQDialog(context,value['the_question'],value['answer'],controller,function ,controllerTopCenter);
     });
   }

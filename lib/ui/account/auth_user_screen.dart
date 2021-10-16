@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:device_info/device_info.dart';
 import 'package:esay/functions/check_auth.dart';
 import 'package:esay/models/user_model.dart';
@@ -14,6 +13,7 @@ import 'package:provider/provider.dart';
 import '../../app_localizations.dart';
 import '../../widgets/appbar.dart';
 import '../../widgets/show_toast.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class AuthUserScreen extends StatefulWidget {
   AuthUserScreen(this.typeAuth);
@@ -183,11 +183,23 @@ class _AuthUserScreenState extends State<AuthUserScreen> {
                               countryCode: countryCode,
                               deviceId: deviceId);
                           if (widget.typeAuth == "register") {
-                            await checkUserRegister(
-                                context, _userModel, widget.typeAuth);
+                            await FirebaseFirestore.instance
+                                .collection('users')
+                                .where('deviceId', isEqualTo: deviceId)
+                                .get()
+                                .then((value) async {
+                              if (value.docs.length == 0) {
+                                await checkUserRegister(
+                                    context, _userModel, widget.typeAuth);
+                              } else {
+                                shoLogin(context);
+                              }
+                            });
                           } else {
-                            await checkUserLogin(
+
+                          await checkUserLogin(
                                 context, _userModel, widget.typeAuth);
+
                           }
                         } else {
                           showToast("phoneNumberEmpty", Colors.red, context);
