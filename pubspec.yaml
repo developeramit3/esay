@@ -55,7 +55,7 @@ dependencies:
   pinput:
   hexcolor:
   flutter_cached_pdfview:
-  flutter_progress_dialog: ^0.1.0
+#  flutter_progress_dialog: ^0.1.0
   random_string:
   flutter_countdown_timer:
   device_preview:

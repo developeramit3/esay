@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:confetti/confetti.dart';
 import 'package:esay/models/offer_category_model.dart';
+import 'package:esay/progress/progress.dart';
+import 'package:esay/progress/progress_dialog.dart';
 import 'package:esay/providers/account_provider.dart';
 import 'package:esay/services/firestore_database.dart';
 import 'package:esay/ui/offers/offers_category_screen.dart';
@@ -11,7 +13,6 @@ import 'package:esay/widgets/rating.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:provider/provider.dart';

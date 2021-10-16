@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:esay/progress/progress_dialog.dart';
 import 'package:esay/providers/account_provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:esay/functions/share.dart';
@@ -15,7 +16,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_countdown_timer/current_remaining_time.dart';
 import 'package:flutter_countdown_timer/flutter_countdown_timer.dart';
-import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:provider/provider.dart';
 import 'package:qr_flutter/qr_flutter.dart';
